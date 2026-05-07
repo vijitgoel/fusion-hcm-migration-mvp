@@ -26,8 +26,21 @@ export default function BatchPage() {
   const [error, setError] = useState('');
   const [result, setResult] = useState<BatchResult | null>(null);
 
+  const isValidFolder = (value: string) => {
+    const trimmed = value.trim();
+    if (!trimmed) return false;
+
+    return (
+      /^[a-zA-Z]:[\\/]/.test(trimmed) ||
+      /^\\\\/.test(trimmed) ||
+      /^\//.test(trimmed) ||
+      /^\.\.?[\\/]/.test(trimmed) ||
+      /[\\/]/.test(trimmed)
+    );
+  };
+
   const runBatch = async () => {
-    if (!folder.trim()) {
+    if (!isValidFolder(folder)) {
       setError('Please enter a valid folder path.');
       setResult(null);
       return;
@@ -105,15 +118,24 @@ export default function BatchPage() {
 
           <input
             type="text"
-            placeholder="C:\Personal\data"
+            placeholder="C:\\Personal\\data"
             value={folder}
-            onChange={(e) => setFolder(e.target.value)}
-            className="block w-full border border-gray-300 rounded-lg px-4 py-3 mb-4 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            onChange={(e) => {
+              setFolder(e.target.value);
+              if (error) setError('');
+            }}
+            className="block w-full border border-gray-300 rounded-lg px-4 py-3 mb-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
+
+          {folder && !isValidFolder(folder) && (
+            <p className="text-sm text-yellow-700 mb-4">
+              Enter a folder path like <span className="font-medium">C:\\data</span>, <span className="font-medium">\\\\server\\share</span>, <span className="font-medium">/home/data</span>, or <span className="font-medium">folder/subfolder</span>.
+            </p>
+          )}
 
           <button
             onClick={runBatch}
-            disabled={loading}
+            disabled={loading || !isValidFolder(folder)}
             className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center transition-colors"
           >
             {loading ? (
