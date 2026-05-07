@@ -2,13 +2,16 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Dict, Iterable, List, Optional, Tuple
+from typing import Dict, List, Optional, Tuple
 
 from .catalog import ObjectDefinition
 from .utils import canonical_column_name
 
 SUPPORTED_EXTENSIONS = {".csv", ".xlsx"}
-SKIP_DIR_NAMES = {".git", ".venv", "node_modules", "__pycache__", ".next", "dist", "build", "output", "phase3_output"}
+SKIP_DIR_NAMES = {
+    ".git", ".venv", "node_modules", "__pycache__", ".next",
+    "dist", "build", "output", "phase3_output"
+}
 
 
 @dataclass
@@ -40,20 +43,23 @@ def discover_files(root: Path, catalog: Dict[str, ObjectDefinition]) -> List[Dis
                 object_match_source=match_source,
             )
         )
+
     return discovered
 
 
 def resolve_object(file_path: Path, catalog: Dict[str, ObjectDefinition]) -> Tuple[Optional[str], str]:
-    tokens = [canonical_column_name(part) for part in file_path.parts] + [canonical_column_name(file_path.stem)]
+    tokens = [canonical_column_name(part) for part in file_path.parts] + [
+        canonical_column_name(file_path.stem)
+    ]
 
     exact_matches: List[Tuple[int, str]] = []
     fuzzy_matches: List[Tuple[int, str]] = []
 
     for object_name, definition in catalog.items():
         aliases = definition.normalized_aliases
+
         for idx, token in enumerate(tokens):
             if token in aliases:
-                # exact match is strongest when found in folder path
                 score = 100 if idx < len(tokens) - 1 else 95
                 exact_matches.append((score, object_name))
             else:

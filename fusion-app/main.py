@@ -1,17 +1,20 @@
-from fastapi import FastAPI, UploadFile, File, Form, Request
-from fastapi.responses import JSONResponse, StreamingResponse
-from fastapi.middleware.cors import CORSMiddleware
-from fastapi.encoders import jsonable_encoder
-from services.phase3.orchestrator import run_batch
+from __future__ import annotations
 
-import pandas as pd
-from io import BytesIO, StringIO
 import logging
 import sys
 import time
+from io import BytesIO, StringIO
 
-from services.validator import validate_columns, validate_data
+import pandas as pd
+from fastapi import FastAPI, File, Form, Request, UploadFile
+from fastapi.encoders import jsonable_encoder
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse, StreamingResponse
+from pydantic import BaseModel
+
 from services.hdl_generator import generate_hdl
+from services.phase3.orchestrator import run_batch
+from services.validator import validate_columns, validate_data
 
 # -----------------------------------------------------------------------------
 # Logging
@@ -34,7 +37,12 @@ if not logger.handlers:
 # -----------------------------------------------------------------------------
 # App
 # -----------------------------------------------------------------------------
-app = FastAPI(title="Fusion HCM HDL Converter")
+app = FastAPI(
+    title="Fusion HCM HDL Converter",
+    version="1.0.0",
+    docs_url="/docs",
+    redoc_url="/redoc",
+)
 
 app.add_middleware(
     CORSMiddleware,
@@ -46,6 +54,12 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# -----------------------------------------------------------------------------
+# Request models
+# -----------------------------------------------------------------------------
+class BatchRequest(BaseModel):
+    folder: str
 
 # -----------------------------------------------------------------------------
 # Helpers
@@ -68,7 +82,6 @@ def make_preview(df: pd.DataFrame, rows: int = 10):
             )
 
     return jsonable_encoder(preview_df.to_dict(orient="records"))
-
 
 # -----------------------------------------------------------------------------
 # Middleware: request logging
@@ -100,7 +113,6 @@ async def log_requests(request: Request, call_next):
     )
     return response
 
-
 # -----------------------------------------------------------------------------
 # Routes
 # -----------------------------------------------------------------------------
@@ -108,16 +120,57 @@ async def log_requests(request: Request, call_next):
 def health():
     return {"status": "ok"}
 
-@app.post("/batch")
-async def batch_process(folder: str = Form(...)):
-    output_folder = "output"
 
-    summary = run_batch(folder, output_folder)
-
+@app.get("/")
+def root():
     return {
-        "status": "success",
-        "summary": summary
+        "status": "ok",
+        "message": "Fusion HCM HDL Converter API",
+        "docs": "/docs",
+        "health": "/health",
+        "batch": "/batch",
+        "upload": "/upload",
     }
+
+
+@app.post("/batch")
+async def batch_process(req: BatchRequest):
+    try:
+        folder = req.folder.strip()
+
+        if not folder:
+            return JSONResponse(
+                status_code=400,
+                content={
+                    "status": "error",
+                    "message": "Missing required field: folder",
+                    "errors": ["folder is required"],
+                    "summary": None,
+                },
+            )
+
+        summary = run_batch(folder)
+
+        return JSONResponse(
+            content={
+                "status": "success",
+                "message": "Batch processing completed successfully.",
+                "summary": jsonable_encoder(summary),
+            }
+        )
+
+    except Exception as e:
+        logger.exception(f"Unhandled error in /batch | error={e}")
+        return JSONResponse(
+            status_code=500,
+            content={
+                "status": "error",
+                "message": f"Server error while running batch: {str(e)}",
+                "errors": [str(e)],
+                "summary": None,
+            },
+        )
+
 
 @app.post("/upload")
 async def upload_file(file: UploadFile = File(...)):
@@ -132,6 +185,7 @@ async def upload_file(file: UploadFile = File(...)):
                     "message": "Only .xlsx or .csv files are allowed!",
                     "errors": ["Invalid file type"],
                     "preview": [],
+                    "hdl": "",
                     "stats": {"total": 0, "valid": 0, "errors": 1},
                 },
             )
@@ -146,11 +200,11 @@ async def upload_file(file: UploadFile = File(...)):
                     "message": "Uploaded file is empty.",
                     "errors": ["No file content found"],
                     "preview": [],
+                    "hdl": "",
                     "stats": {"total": 0, "valid": 0, "errors": 1},
                 },
             )
 
-        # Read file
         if file.filename.lower().endswith(".xlsx"):
             df = pd.read_excel(BytesIO(content))
         else:
@@ -159,13 +213,11 @@ async def upload_file(file: UploadFile = File(...)):
 
         logger.info(f"File parsed | rows={len(df)} | cols={len(df.columns)}")
 
-        # Normalize column names
         df.columns = df.columns.str.strip()
         df.columns = [col.replace(" ", "") for col in df.columns]
 
         logger.info(f"Normalized columns: {list(df.columns)}")
 
-        # Validate required columns
         missing_cols = validate_columns(df)
         if missing_cols:
             return JSONResponse(
@@ -175,6 +227,7 @@ async def upload_file(file: UploadFile = File(...)):
                     "message": "Missing required columns",
                     "errors": [f"Missing columns: {', '.join(missing_cols)}"],
                     "preview": make_preview(df),
+                    "hdl": "",
                     "stats": {
                         "total": len(df),
                         "valid": 0,
@@ -183,7 +236,6 @@ async def upload_file(file: UploadFile = File(...)):
                 },
             )
 
-        # Validate data
         errors = validate_data(df)
         preview = make_preview(df)
 
@@ -196,6 +248,7 @@ async def upload_file(file: UploadFile = File(...)):
                     "message": "Validation errors found",
                     "errors": errors,
                     "preview": preview,
+                    "hdl": "",
                     "stats": {
                         "total": len(df),
                         "valid": valid_count,
@@ -204,7 +257,6 @@ async def upload_file(file: UploadFile = File(...)):
                 },
             )
 
-        # Generate HDL
         hdl_content = generate_hdl(df)
 
         return JSONResponse(
@@ -226,6 +278,7 @@ async def upload_file(file: UploadFile = File(...)):
                 "message": "CSV file could not be decoded. Please save it as UTF-8.",
                 "errors": ["Unicode decode error"],
                 "preview": [],
+                "hdl": "",
                 "stats": {"total": 0, "valid": 0, "errors": 1},
             },
         )
@@ -239,6 +292,7 @@ async def upload_file(file: UploadFile = File(...)):
                 "message": f"Server error while processing file: {str(e)}",
                 "errors": [str(e)],
                 "preview": [],
+                "hdl": "",
                 "stats": {"total": 0, "valid": 0, "errors": 1},
             },
         )
@@ -252,6 +306,11 @@ async def download(hdl: str = Form(...)):
         headers={"Content-Disposition": 'attachment; filename="worker.hdl.csv"'},
     )
 
+if __name__ == "__main__":
+    import uvicorn
+
+    uvicorn.run("main:app", host="127.0.0.1", port=8000, reload=True)
+    
 # To run:
 # uvicorn main:app --reload
 # Visit http://127.0.0.1:8000/
