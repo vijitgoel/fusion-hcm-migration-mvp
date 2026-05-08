@@ -1,0 +1,9 @@
+METADATA|Department|DepartmentCode|DepartmentName|EffectiveStartDate|Manager|BusinessUnit|Status
+MERGE|Department|PRJ_PROJECT_UNIT|My Project Unit Name|01/01/0001|||
+MERGE|Department|FIN_DEPT|Finance Department|01/01/0001|||
+MERGE|Department|HR_DEPT|HR Department|01/01/0001|||
+MERGE|Department|IT_DEPT|IT Department|01/01/0001|||
+MERGE|Department|SALES_DEPT|Sales Department|01/01/0001|||
+MERGE|Department|MKTG_DEPT|Marketing Department|01/01/0001|||
+MERGE|Department|OPS_DEPT|Operations Department|01/01/0001|||
+MERGE|Department|LEGAL_DEPT|Legal Department|01/01/0001|||

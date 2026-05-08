@@ -14,6 +14,7 @@ class ObjectDefinition:
     optional_columns: List[str] = field(default_factory=list)
     unique_columns: List[str] = field(default_factory=list)
     date_columns: List[str] = field(default_factory=list)
+    column_aliases: Dict[str, List[str]] = field(default_factory=dict)
     output_header: str = ""
     output_template: str = ""
     description: str = ""
@@ -39,13 +40,21 @@ OBJECT_CATALOG: Dict[str, ObjectDefinition] = {
     "Worker": ObjectDefinition(
         name="Worker",
         aliases=["worker", "workers", "emp", "employee", "person"],
-        required_columns=["EmployeeNumber", "FirstName", "LastName", "HireDate"],
+        required_columns=["PersonNumber", "FirstName", "LastName", "StartDate"],
         optional_columns=["Email", "BusinessUnit", "Department", "Location", "Nationality"],
-        unique_columns=["EmployeeNumber"],
-        date_columns=["HireDate"],
+        unique_columns=["PersonNumber"],
+        date_columns=["StartDate"],
+        column_aliases={
+            "PersonNumber": ["PersonNumber", "EmployeeNumber"],
+            "StartDate": ["StartDate", "HireDate"],
+            "Department": ["Department", "DepartmentCode", "DeptCode"],
+            "BusinessUnit": ["BusinessUnit", "BU"],
+            "Location": ["Location", "LocCode"],
+            "Nationality": ["Nationality", "Country"],
+        },
         output_header="METADATA|Worker|PersonNumber|FirstName|LastName|StartDate|Email|BusinessUnit|Department|Location|Nationality",
         output_template=(
-            "MERGE|Worker|{EmployeeNumber}|{FirstName}|{LastName}|{HireDate}|"
+            "MERGE|Worker|{PersonNumber}|{FirstName}|{LastName}|{StartDate}|"
             "{Email}|{BusinessUnit}|{Department}|{Location}|{Nationality}"
         ),
         description="Worker object migration file.",
@@ -57,6 +66,12 @@ OBJECT_CATALOG: Dict[str, ObjectDefinition] = {
         optional_columns=["Country", "City", "State", "Status"],
         unique_columns=["LocationCode"],
         date_columns=["EffectiveStartDate"],
+        column_aliases={
+            "City": ["City", "TownOrCity"],
+            "Status": ["Status", "ActiveStatus"],
+            "State": ["State", "Region1", "Province"],
+            "Country": ["Country"],
+        },
         output_header="METADATA|Location|LocationCode|LocationName|EffectiveStartDate|Country|City|State|Status",
         output_template=(
             "MERGE|Location|{LocationCode}|{LocationName}|{EffectiveStartDate}|"
@@ -71,6 +86,14 @@ OBJECT_CATALOG: Dict[str, ObjectDefinition] = {
         optional_columns=["Manager", "BusinessUnit", "Status"],
         unique_columns=["DepartmentCode"],
         date_columns=["EffectiveStartDate"],
+        column_aliases={
+            "DepartmentCode": ["DepartmentCode", "Code", "ClassificationCode"],
+            "DepartmentName": ["DepartmentName", "Name", "DeptName"],
+            "EffectiveStartDate": ["EffectiveStartDate", "StartDate"],
+            "Manager": ["Manager"],
+            "BusinessUnit": ["BusinessUnit", "BU"],
+            "Status": ["Status", "ActiveStatus"],
+        },
         output_header="METADATA|Department|DepartmentCode|DepartmentName|EffectiveStartDate|Manager|BusinessUnit|Status",
         output_template=(
             "MERGE|Department|{DepartmentCode}|{DepartmentName}|{EffectiveStartDate}|"

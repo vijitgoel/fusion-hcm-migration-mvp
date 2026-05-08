@@ -4,8 +4,9 @@ from pathlib import Path
 from typing import Any, Dict
 
 from .catalog import get_object_catalog
+from .catalog import ObjectDefinition
 from .hdl_writer import write_dat
-from .processor import normalize, read_file, validate
+from .processor import map_columns, normalize, read_file, validate
 from .scanner import discover_files
 
 
@@ -36,18 +37,19 @@ def run_batch(root_folder: str) -> Dict[str, Any]:
             summary["skipped_files"] += 1
             continue
 
-        obj = catalog[discovered.object_name]
+        obj: ObjectDefinition = catalog[discovered.object_name]
 
         try:
             df = read_file(discovered.path)
             df = normalize(df)
+            mapped_df = map_columns(df, obj)
 
-            errors = validate(df, obj.required_columns)
-            clean_df = df if not errors else df.iloc[0:0]
+            errors = validate(mapped_df, obj.required_columns)
+            clean_df = mapped_df if not errors else pd.DataFrame(columns=mapped_df.columns)
 
             write_dat(
                 clean_df,
-                obj.name,
+                obj,
                 output_folder,
                 source_name=discovered.path.stem,
             )
