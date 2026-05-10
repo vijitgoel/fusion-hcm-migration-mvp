@@ -1,0 +1,9 @@
+METADATA|Worker|SOURCE_SYSTEM_OWNER|SOURCE_SYSTEM_ID|PERSON_NUMBER|FIRST_NAME|LAST_NAME|START_DATE|EMAIL|BUSINESS_UNIT|DEPARTMENT|LOCATION|NATIONALITY
+MERGE|Worker|EBS|HCM_EMP_001|EMP001|John|Doe|2023/01/15|john.doe@company.com||PU1||
+MERGE|Worker|EBS|HCM_EMP_002|EMP002|Jane|Smith|2023/02/20|jane.smith@company.com||PU2||
+MERGE|Worker|EBS|HCM_EMP_003|EMP003|Mike|Johnson|2023/03/10|mike.johnson@company.com||PU3||
+MERGE|Worker|EBS|HCM_EMP_004|EMP004|Sarah|Wilson|2023/04/05|sarah.wilson@company.com||PU4||
+MERGE|Worker|EBS|HCM_EMP_005|EMP005|David|Brown|2023/05/12|david.brown@company.com||PU5||
+MERGE|Worker|EBS|HCM_EMP_006|EMP006|Emily|Davis|2023/06/18|emily.davis@company.com||PU6||
+MERGE|Worker|EBS|HCM_EMP_007|EMP007|Robert|Taylor|2023/07/22|robert.taylor@company.com||PU7||
+MERGE|Worker|EBS|HCM_EMP_008|EMP008|Lisa|Anderson|2023/08/30|lisa.anderson@company.com||PU8||
