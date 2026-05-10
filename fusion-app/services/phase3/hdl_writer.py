@@ -12,9 +12,9 @@ def write_dat(df, obj: ObjectDefinition, output_path, source_name=None):
     output_dir.mkdir(parents=True, exist_ok=True)
 
     if source_name:
-        file_name = f"{source_name}_{obj.name}.dat"
+        file_name = obj.output_filename_template.format(source=source_name, name=obj.name)
     else:
-        file_name = f"{obj.name}.dat"
+        file_name = obj.output_filename_template.format(name=obj.name)
 
     file_path = output_dir / file_name
 
