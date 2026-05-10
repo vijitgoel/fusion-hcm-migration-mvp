@@ -7,7 +7,7 @@ def validate_columns(df):
     Check if required columns exist in the DataFrame.
     """
     missing = [col for col in REQUIRED_COLUMNS if col not in df.columns]
-    return missing
+    return [{"row": None, "column": col, "message": f"Missing required column: {col}"} for col in missing]
 
 def is_empty(val):
     """
@@ -34,7 +34,7 @@ def validate_data(df):
             continue
         empty_rows = df[df[col].apply(is_empty)]
         for idx in empty_rows.index:
-            errors.append(f"Row {idx+1}: {col} is missing")
+            errors.append({"row": idx + 1, "column": col, "message": f"Required field {col} is empty (provided value is empty or null)"})
 
     # Check uniqueness (all duplicates with keep=False)
     for col, rules in VALIDATION_RULES.items():
@@ -42,7 +42,9 @@ def validate_data(df):
             continue
         duplicates = df[df.duplicated(subset=[col], keep=False)]
         for idx in duplicates.index:
-            errors.append(f"Row {idx+1}: Duplicate {col}")
+            value = df.at[idx, col]
+            value_msg = f" (value: '{value}')" if not pd.isna(value) and str(value).strip() else ""
+            errors.append({"row": idx + 1, "column": col, "message": f"Duplicate value in {col}{value_msg}"})
 
     # Check date validation for HireDate
     for col, rules in VALIDATION_RULES.items():

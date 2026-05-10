@@ -155,7 +155,7 @@ async def batch_process(req: BatchRequest):
             content={
                 "status": "success",
                 "message": "Batch processing completed successfully.",
-                "summary": jsonable_encoder(summary),
+                **jsonable_encoder(summary)
             }
         )
 

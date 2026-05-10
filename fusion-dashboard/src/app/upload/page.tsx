@@ -285,21 +285,46 @@ export default function UploadPage() {
                     response.stats
                   )}
 
-                  {response.errors &&
-                    response.errors.length > 0 && (
-                      <ul className="text-yellow-800 space-y-2 max-h-48 overflow-y-auto">
-                        {response.errors.map(
-                          (err, index) => (
-                            <li
-                              key={index}
-                              className="list-disc ml-4"
-                            >
-                              {err}
-                            </li>
-                          )
-                        )}
-                      </ul>
-                    )}
+                {response.errors &&
+                  response.errors.length > 0 && (
+                    <div className="mt-4">
+                      {typeof response.errors[0] === 'string' ? (
+                        <ul className="text-yellow-800 space-y-2 max-h-48 overflow-y-auto">
+                          {response.errors.map(
+                            (err, index) => (
+                              <li
+                                key={index}
+                                className="list-disc ml-4"
+                              >
+                                {err}
+                              </li>
+                            )
+                          )}
+                        </ul>
+                      ) : (
+                        <div className="overflow-x-auto">
+                          <table className="min-w-full divide-y divide-yellow-200">
+                            <thead className="bg-yellow-100">
+                              <tr>
+                                <th className="px-4 py-2 text-left text-xs font-semibold text-yellow-700">Row</th>
+                                <th className="px-4 py-2 text-left text-xs font-semibold text-yellow-700">Column</th>
+                                <th className="px-4 py-2 text-left text-xs font-semibold text-yellow-700">Message</th>
+                              </tr>
+                            </thead>
+                            <tbody className="bg-white divide-y divide-yellow-200">
+                              {(response.errors as Array<{row: number | null; column: string; message: string}>).map((err, index) => (
+                                <tr key={index}>
+                                  <td className="px-4 py-2 text-xs text-yellow-900">{err.row ?? 'N/A'}</td>
+                                  <td className="px-4 py-2 text-xs font-mono text-yellow-700">{err.column}</td>
+                                  <td className="px-4 py-2 text-xs text-yellow-700">{err.message}</td>
+                                </tr>
+                              ))}
+                            </tbody>
+                          </table>
+                        </div>
+                      )}
+                    </div>
+                  )}
                 </div>
 
                 <PreviewTable
