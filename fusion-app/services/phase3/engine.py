@@ -13,6 +13,8 @@ from .scanner import discover_files
 from .utils import canonical_column_name, ensure_dir, is_empty, new_id, normalize_value, now_iso
 from .writer import bundle_run_directory, write_dat, write_json, write_rejected_csv
 
+from ..object_lookup import ObjectLookup
+
 
 @dataclass
 class CleanRecord:
@@ -114,6 +116,9 @@ def process_folder(root_folder: Path, output_mode: str = "flat") -> Dict[str, An
         extra={"output_mode": output_mode},
     )
 
+    # Initialize reusable lookup service once per run (uses central FUSION_CONFIG only)
+    lookup_service = ObjectLookup()
+
     discovered = discover_files(root_folder, OBJECT_CATALOG)
     audit_logger.log(
         "FILES_DISCOVERED",
@@ -133,6 +138,7 @@ def process_folder(root_folder: Path, output_mode: str = "flat") -> Dict[str, An
             run_id=run_id,
             discovered_file=discovered_file,
             audit_logger=audit_logger,
+            lookup_service=lookup_service,
         )
 
         file_public = asdict(file_result)
@@ -270,6 +276,7 @@ def process_single_file(
     run_id: str,
     discovered_file,
     audit_logger: Phase3AuditLogger,
+    lookup_service: ObjectLookup,
 ) -> RunResult:
     source_path = discovered_file.path
     object_name = discovered_file.object_name
@@ -526,16 +533,78 @@ def process_single_file(
                     extra=issue.to_dict(),
                 )
         else:
-            valid_records.append(
-                CleanRecord(
+            # === NEW: Additional Fusion HCM SaaS existence check (post-local validation) ===
+            # This is the requested extra layer. It does NOT replace local rules, duplicate
+            # detection, or HDL generation. Failures are logged as warnings (per-row, non-blocking).
+            # Only records that pass local validation AND do not already exist in Fusion
+            # are kept for HDL output.
+            lookup_result = lookup_service.check_record_exists(object_name, clean_row)
+
+            if lookup_result.get("fusion_exists", False):
+                issue = ValidationIssue(
+                    validation_id=new_id("VAL"),
                     run_id=run_id,
                     object_name=object_name,
                     source_file=str(source_path),
                     relative_source_file=relative_source_file,
                     source_row_number=row_num,
-                    row_data=clean_row,
+                    error_code="ALREADY_EXISTS_IN_FUSION",
+                    field_name=None,
+                    message=lookup_result.get(
+                        "message", f"Row {row_num}: Record already exists in Fusion"
+                    ),
+                    row_values=row_dict,
                 )
-            )
+                issues_for_row.append(issue)
+                file_issues.append(issue.to_dict())
+                rejected_payloads.append(
+                    {
+                        "validation_id": issue.validation_id,
+                        "run_id": run_id,
+                        "object_name": object_name,
+                        "source_file": str(source_path),
+                        "relative_source_file": relative_source_file,
+                        "source_row_number": row_num,
+                        "error_code": issue.error_code,
+                        "field_name": issue.field_name,
+                        "message": issue.message,
+                        "row_values": row_dict,
+                        "row_id": None,
+                        "fusion_lookup": lookup_result,
+                    }
+                )
+                audit_logger.log(
+                    "ROW_ALREADY_EXISTS_IN_FUSION",
+                    issue.message,
+                    level="WARNING",
+                    object_name=object_name,
+                    source_file=str(source_path),
+                    extra={**issue.to_dict(), "fusion_lookup": lookup_result},
+                )
+            elif not lookup_result.get("lookup_success", True):
+                # Lookup failure is a per-row warning (non-blocking, as specified)
+                audit_logger.log(
+                    "FUSION_LOOKUP_WARNING",
+                    lookup_result.get("message", "Fusion lookup failed"),
+                    level="WARNING",
+                    object_name=object_name,
+                    source_file=str(source_path),
+                    extra={"row_num": row_num, "fusion_lookup": lookup_result},
+                )
+            # If lookup succeeded and record does NOT exist, or was a warning only,
+            # the row remains valid for HDL generation (existing behavior preserved).
+
+            if not issues_for_row:  # re-check after possible Fusion issue
+                valid_records.append(
+                    CleanRecord(
+                        run_id=run_id,
+                        object_name=object_name,
+                        source_file=str(source_path),
+                        relative_source_file=relative_source_file,
+                        source_row_number=row_num,
+                        row_data=clean_row,
+                    )
+                )
 
     return RunResult(
         source_file=str(source_path),

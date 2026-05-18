@@ -1,0 +1,9 @@
+METADATA|Organization|SourceSystemOwner|SourceSystemId|ActionReasonCode|ClassificationName|EffectiveStartDate|EffectiveEndDate|LocationCode|LocationSetCode|Name|SourceRefTableName|EstablishmentName|InternalAddressLine|Title|GUID
+MERGE|Organization|SOURCE_SYSTEM_OWNER|PU1|||0001/01/01||||My Project Unit Name|||||
+MERGE|Organization|SOURCE_SYSTEM_OWNER|PU2|||0001/01/01||||Finance Department|||||
+MERGE|Organization|SOURCE_SYSTEM_OWNER|PU3|||0001/01/01||||HR Department|||||
+MERGE|Organization|SOURCE_SYSTEM_OWNER|PU4|||0001/01/01||||IT Department|||||
+MERGE|Organization|SOURCE_SYSTEM_OWNER|PU5|||0001/01/01||||Sales Department|||||
+MERGE|Organization|SOURCE_SYSTEM_OWNER|PU6|||0001/01/01||||Marketing Department|||||
+MERGE|Organization|SOURCE_SYSTEM_OWNER|PU7|||0001/01/01||||Operations Department|||||
+MERGE|Organization|SOURCE_SYSTEM_OWNER|PU8|||0001/01/01||||Legal Department|||||

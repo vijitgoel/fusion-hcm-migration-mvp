@@ -13,8 +13,9 @@ from fastapi.responses import JSONResponse, StreamingResponse
 from pydantic import BaseModel
 
 from services.hdl_generator import generate_hdl
-from services.phase3.orchestrator import run_batch
+from services.phase3.engine import process_folder
 from services.validator import validate_columns, validate_data
+from pathlib import Path
 
 # -----------------------------------------------------------------------------
 # Logging
@@ -149,7 +150,11 @@ async def batch_process(req: BatchRequest):
                 },
             )
 
-        summary = run_batch(folder)
+        # Use modern engine (process_folder) for /batch as the single pipeline.
+        # It now includes the additional Fusion existence check via ObjectLookup.
+        # Config is pulled centrally from services/config.py (FUSION_CONFIG).
+        # Legacy orchestrator is no longer used for new batch requests.
+        summary = process_folder(Path(folder))
 
         return JSONResponse(
             content={

@@ -1,7 +1,5 @@
 {
-  "/batch/validation-errors/page": "app/batch/validation-errors/page.js",
   "/batch/page": "app/batch/page.js",
-  "/batch/object-errors/page": "app/batch/object-errors/page.js",
   "/page": "app/page.js",
-  "/upload/page": "app/upload/page.js"
+  "/batch/object-errors/page": "app/batch/object-errors/page.js"
 }

@@ -21,25 +21,10 @@
       "static/chunks/main-app.js",
       "static/chunks/app/batch/page.js"
     ],
-    "/upload/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/upload/page.js"
-    ],
     "/batch/object-errors/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
       "static/chunks/app/batch/object-errors/page.js"
-    ],
-    "/batch/validation-errors/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/batch/validation-errors/page.js"
-    ],
-    "/validation/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/validation/page.js"
     ]
   }
 }
