@@ -473,7 +473,7 @@ OBJECT_CATALOG: Dict[str, ObjectDefinition] = {
         description="Grade object migration file for Oracle Fusion HCM Workforce Structures.",
     ),
 
-    "GradeRate": ObjectDefinition( # type: ignore
+    "GradeRate": ObjectDefinition( 
         name="GradeRate",
         aliases=["grade rate", "graderate", "grade_rate", "salary rate", "pay rate"],
         required_columns=[
@@ -729,7 +729,7 @@ OBJECT_CATALOG: Dict[str, ObjectDefinition] = {
         description="GradeRate object migration file. Includes GradeRateValue child record for min/max/midpoint/value amounts. GradeCode links the rate value to a specific grade.",
     ),
 
-    "Job": ObjectDefinition(  # type: ignore
+    "Job": ObjectDefinition(  
         name="Job",
         aliases=["job", "jobs", "role", "roles"],
         required_columns=[
@@ -1011,7 +1011,7 @@ OBJECT_CATALOG: Dict[str, ObjectDefinition] = {
         description="Job object migration file. Loads job definitions into Oracle Fusion HCM. Must load JobFamily.dat first if JOB_FAMILY_CODE or JOB_FAMILY_NAME is used.",
     ),
 
-    "JobFamily": ObjectDefinition(  # type: ignore
+    "JobFamily": ObjectDefinition(  
         name="JobFamily",
         aliases=["job family", "jobfamily", "job_family", "family"],
         required_columns=[
@@ -1121,7 +1121,7 @@ OBJECT_CATALOG: Dict[str, ObjectDefinition] = {
         ),
         description="JobFamily object migration file. Loads job family definitions into Oracle Fusion HCM. Must be loaded before Job.dat.",
     ),
-    "Position": ObjectDefinition(  # type: ignore
+    "Position": ObjectDefinition(  
         name="Position",
         aliases=["position", "positions", "post", "posts"],
         required_columns=[
@@ -1628,7 +1628,7 @@ OBJECT_CATALOG: Dict[str, ObjectDefinition] = {
         description="Position object migration file. Loads position definitions into Oracle Fusion HCM. Must load Department.dat, Job.dat, and Location.dat first.",
     ),
 
-    "GradeLadder": ObjectDefinition(  # type: ignore
+    "GradeLadder": ObjectDefinition(  
         name="GradeLadder",
         aliases=["grade ladder", "gradeladder", "grade_ladder", "ladder"],
         required_columns=[
@@ -1971,6 +1971,2283 @@ OBJECT_CATALOG: Dict[str, ObjectDefinition] = {
             "|{RATE_CHANGE_DATE_RULE_NAME}|{SALARY_ACTION_REASON_CODE}|{GUID}"
         ),
         description="GradeLadder object migration file. Loads grade ladder definitions into Oracle Fusion HCM. Must load Grade.dat first.",
+    ),
+    
+    "Worker": ObjectDefinition( # type: ignore
+        name="Worker",
+        aliases=["worker", "workers", "employee", "employees", "person", "persons"],
+        required_columns=[
+            "SOURCE_SYSTEM_OWNER",
+            "SOURCE_SYSTEM_ID",
+            "PERSON_NUMBER",
+            "EFFECTIVE_START_DATE",
+            "START_DATE",
+        ],
+        optional_columns=[
+            "EFFECTIVE_END_DATE",
+            "BLOOD_TYPE",
+            "PERSON_DUPLICATE_CHECK",
+            "DATE_OF_BIRTH",
+            "DATE_OF_DEATH",
+            "COUNTRY_OF_BIRTH",
+            "REGION_OF_BIRTH",
+            "TOWN_OF_BIRTH",
+            "GUID",
+            "ACTION_CODE",
+            "REASON_CODE",
+            "CORRESPONDENCE_LANGUAGE",
+        ],
+        unique_columns=[
+            "PERSON_NUMBER",
+            "SOURCE_SYSTEM_ID",
+        ],
+        date_columns=[
+            "EFFECTIVE_START_DATE",
+            "EFFECTIVE_END_DATE",
+            "START_DATE",
+            "DATE_OF_BIRTH",
+            "DATE_OF_DEATH",
+        ],
+        column_aliases={
+            "SOURCE_SYSTEM_OWNER": ["SourceSystemOwner", "source_system_owner"],
+            "SOURCE_SYSTEM_ID": ["SourceSystemId", "source_system_id"],
+            "PERSON_NUMBER": ["PersonNumber", "person_number", "Person_Number"],
+            "EFFECTIVE_START_DATE": ["EffectiveStartDate", "effective_start_date", "StartDate", "start_date"],
+            "START_DATE": ["StartDate", "start_date", "HireDate", "hire_date"],
+            "EFFECTIVE_END_DATE": ["EffectiveEndDate", "effective_end_date", "EndDate", "end_date"],
+            "BLOOD_TYPE": ["BloodType", "blood_type", "Blood_Type"],
+            "PERSON_DUPLICATE_CHECK": [
+                "PersonDuplicateCheck", "person_duplicate_check",
+                "Person_Duplicate_Check", "DuplicateCheck", "duplicate_check",
+            ],
+            "DATE_OF_BIRTH": ["DateOfBirth", "date_of_birth", "DOB", "dob", "BirthDate", "birth_date"],
+            "DATE_OF_DEATH": ["DateOfDeath", "date_of_death", "DOD", "dod", "DeathDate", "death_date"],
+            "COUNTRY_OF_BIRTH": [
+                "CountryOfBirth", "country_of_birth", "Country_Of_Birth",
+                "BirthCountry", "birth_country",
+            ],
+            "REGION_OF_BIRTH": [
+                "RegionOfBirth", "region_of_birth", "Region_Of_Birth",
+                "BirthRegion", "birth_region",
+            ],
+            "TOWN_OF_BIRTH": [
+                "TownOfBirth", "town_of_birth", "Town_Of_Birth",
+                "BirthTown", "birth_town", "CityOfBirth", "city_of_birth",
+            ],
+            "GUID": ["GUID", "guid", "GlobalUniqueIdentifier", "global_unique_identifier"],
+            "ACTION_CODE": ["ActionCode", "action_code", "Action_Code"],
+            "REASON_CODE": ["ReasonCode", "reason_code", "Reason_Code", "ActionReasonCode", "action_reason_code"],
+            "CORRESPONDENCE_LANGUAGE": [
+                "CorrespondenceLanguage", "correspondence_language",
+                "Correspondence_Language", "CorresLang", "corres_lang",
+            ],
+        },
+        validation_rules={
+            "SOURCE_SYSTEM_OWNER": {
+                "required": False,
+                "min_length": 1,
+                "max_length": 30,
+                "regex": r"^[A-Z0-9_]+$",
+                "error_msg": "SOURCE_SYSTEM_OWNER must be uppercase alphanumeric/underscore, 1-30 chars",
+            },
+            "SOURCE_SYSTEM_ID": {
+                "required": False,
+                "min_length": 1,
+                "max_length": 30,
+                "regex": r"^[A-Z0-9_-]+$",
+                "error_msg": "SOURCE_SYSTEM_ID must be alphanumeric with underscores/dashes, 1-30 chars",
+            },
+            "PERSON_NUMBER": {
+                "required": True,
+                "min_length": 1,
+                "max_length": 30,
+                "regex": r"^[A-Z0-9_-]+$",
+                "error_msg": "PERSON_NUMBER must be alphanumeric with underscores/dashes, 1-30 chars",
+            },
+            "EFFECTIVE_START_DATE": {
+                "required": True,
+                "data_type": "date",
+                "error_msg": "EFFECTIVE_START_DATE must be a valid date",
+            },
+            "START_DATE": {
+                "required": True,
+                "data_type": "date",
+                "error_msg": "START_DATE (new record hire/start date) must be a valid date",
+            },
+            "EFFECTIVE_END_DATE": {
+                "required": False,
+                "data_type": "date",
+                "error_msg": "EFFECTIVE_END_DATE must be a valid date",
+            },
+            "BLOOD_TYPE": {
+                "required": False,
+                "min_length": 1,
+                "max_length": 30,
+                "allowed_values": ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"],
+                "error_msg": "BLOOD_TYPE must be a valid blood group (e.g. A+, O-, AB+)",
+            },
+            "PERSON_DUPLICATE_CHECK": {
+                "required": False,
+                "min_length": 1,
+                "max_length": 240,
+                "error_msg": "PERSON_DUPLICATE_CHECK must be 1-240 chars",
+            },
+            "DATE_OF_BIRTH": {
+                "required": False,
+                "data_type": "date",
+                "error_msg": "DATE_OF_BIRTH must be a valid date",
+            },
+            "DATE_OF_DEATH": {
+                "required": False,
+                "data_type": "date",
+                "error_msg": "DATE_OF_DEATH must be a valid date",
+            },
+            "COUNTRY_OF_BIRTH": {
+                "required": False,
+                "min_length": 2,
+                "max_length": 2,
+                "regex": r"^[A-Z]{2}$",
+                "error_msg": "COUNTRY_OF_BIRTH must be a 2-letter ISO country code (e.g. IN, US, GB)",
+            },
+            "REGION_OF_BIRTH": {
+                "required": False,
+                "min_length": 1,
+                "max_length": 30,
+                "error_msg": "REGION_OF_BIRTH must be 1-30 chars",
+            },
+            "TOWN_OF_BIRTH": {
+                "required": False,
+                "min_length": 1,
+                "max_length": 30,
+                "error_msg": "TOWN_OF_BIRTH must be 1-30 chars",
+            },
+            "GUID": {
+                "required": False,
+                "min_length": 1,
+                "max_length": 64,
+                "regex": r"^[A-Za-z0-9_\-]+$",
+                "error_msg": "GUID must be alphanumeric with underscores/dashes, 1-64 chars",
+            },
+            "ACTION_CODE": {
+                "required": False,
+                "min_length": 1,
+                "max_length": 30,
+                "regex": r"^[A-Z0-9_]+$",
+                "error_msg": "ACTION_CODE must be uppercase alphanumeric/underscore, 1-30 chars",
+            },
+            "REASON_CODE": {
+                "required": False,
+                "min_length": 1,
+                "max_length": 30,
+                "regex": r"^[A-Z0-9_]+$",
+                "error_msg": "REASON_CODE must be uppercase alphanumeric/underscore, 1-30 chars",
+            },
+            "CORRESPONDENCE_LANGUAGE": {
+                "required": False,
+                "min_length": 2,
+                "max_length": 30,
+                "regex": r"^[A-Z]{2,3}$",
+                "error_msg": "CORRESPONDENCE_LANGUAGE must be a valid 2-3 letter language code (e.g. EN, FR, HI)",
+            },
+        },
+        default_source_system_owner="HCMQA-001",
+        default_source_system_id="WORKER_{row_index}",
+        output_filename_template="Worker.dat",
+        output_header="METADATA|Worker|SourceSystemOwner|SourceSystemId|EffectiveStartDate|EffectiveEndDate|PersonNumber|StartDate|BloodType|PersonDuplicateCheck|DateOfBirth|DateOfDeath|CountryOfBirth|RegionOfBirth|TownOfBirth|GUID|ActionCode|ReasonCode|CorrespondenceLanguage",
+        output_template=(
+            "MERGE|Worker|{SOURCE_SYSTEM_OWNER}|{SOURCE_SYSTEM_ID}|"
+            "{EFFECTIVE_START_DATE}|{EFFECTIVE_END_DATE}|"
+            "{PERSON_NUMBER}|{START_DATE}|"
+            "{BLOOD_TYPE}|{PERSON_DUPLICATE_CHECK}|"
+            "{DATE_OF_BIRTH}|{DATE_OF_DEATH}|"
+            "{COUNTRY_OF_BIRTH}|{REGION_OF_BIRTH}|{TOWN_OF_BIRTH}|"
+            "{GUID}|{ACTION_CODE}|{REASON_CODE}|{CORRESPONDENCE_LANGUAGE}"
+        ),
+        description="Worker (Person) object migration file for Oracle Fusion HCM Workforce Structures.",
+    ),
+
+    "ExternalIdentifier": ObjectDefinition( # type: ignore
+        name="ExternalIdentifier",
+        aliases=["external_identifier", "externalidentifier", "ext_identifier", "external identifier"],
+        required_columns=[
+            "SOURCE_SYSTEM_OWNER",
+            "SOURCE_SYSTEM_ID",
+            "PERSON_NUMBER",
+            "EXTERNAL_IDENTIFIER_SEQUENCE",
+            "EXTERNAL_IDENTIFIER_NUMBER",
+            "EXTERNAL_IDENTIFIER_TYPE",
+            "DATE_FROM",
+        ],
+        optional_columns=[
+            "GUID",
+            "COMMENTS",
+            "ASSIGNMENT_NUMBER",
+            "DATE_TO",
+        ],
+        unique_columns=[
+            "PERSON_NUMBER",
+            "EXTERNAL_IDENTIFIER_SEQUENCE",
+            "SOURCE_SYSTEM_ID",
+        ],
+        date_columns=[
+            "DATE_FROM",
+            "DATE_TO",
+        ],
+        column_aliases={
+            "SOURCE_SYSTEM_OWNER": ["SourceSystemOwner", "source_system_owner"],
+            "SOURCE_SYSTEM_ID": ["SourceSystemId", "source_system_id"],
+            "PERSON_NUMBER": ["PersonNumber", "person_number", "Person_Number"],
+            "EXTERNAL_IDENTIFIER_SEQUENCE": [
+                "ExternalIdentifierSequence", "external_identifier_sequence",
+                "External_Identifier_Sequence", "IdentifierSequence", "identifier_sequence",
+            ],
+            "EXTERNAL_IDENTIFIER_NUMBER": [
+                "ExternalIdentifierNumber", "external_identifier_number",
+                "External_Identifier_Number", "IdentifierNumber", "identifier_number",
+            ],
+            "EXTERNAL_IDENTIFIER_TYPE": [
+                "ExternalIdentifierType", "external_identifier_type",
+                "External_Identifier_Type", "IdentifierType", "identifier_type",
+            ],
+            "DATE_FROM": ["DateFrom", "date_from", "Date_From", "StartDate", "start_date", "EffectiveStartDate", "effective_start_date"],
+            "DATE_TO": ["DateTo", "date_to", "Date_To", "EndDate", "end_date", "EffectiveEndDate", "effective_end_date"],
+            "GUID": ["GUID", "guid", "GlobalUniqueIdentifier", "global_unique_identifier"],
+            "COMMENTS": ["Comments", "comments", "Comment", "comment", "Notes", "notes"],
+            "ASSIGNMENT_NUMBER": [
+                "AssignmentNumber", "assignment_number", "Assignment_Number",
+                "AssignmentNum", "assignment_num",
+            ],
+        },
+        validation_rules={
+            "SOURCE_SYSTEM_OWNER": {
+                "required": False,
+                "min_length": 1,
+                "max_length": 30,
+                "regex": r"^[A-Z0-9_]+$",
+                "error_msg": "SOURCE_SYSTEM_OWNER must be uppercase alphanumeric/underscore, 1-30 chars",
+            },
+            "SOURCE_SYSTEM_ID": {
+                "required": False,
+                "min_length": 1,
+                "max_length": 30,
+                "regex": r"^[A-Z0-9_-]+$",
+                "error_msg": "SOURCE_SYSTEM_ID must be alphanumeric with underscores/dashes, 1-30 chars",
+            },
+            "PERSON_NUMBER": {
+                "required": True,
+                "min_length": 1,
+                "max_length": 30,
+                "regex": r"^[A-Z0-9_-]+$",
+                "error_msg": "PERSON_NUMBER must be alphanumeric with underscores/dashes, 1-30 chars",
+            },
+            "EXTERNAL_IDENTIFIER_SEQUENCE": {
+                "required": True,
+                "min_length": 1,
+                "max_length": 30,
+                "regex": r"^[0-9]+$",
+                "error_msg": "EXTERNAL_IDENTIFIER_SEQUENCE must be a numeric value, 1-30 chars",
+            },
+            "EXTERNAL_IDENTIFIER_NUMBER": {
+                "required": True,
+                "min_length": 1,
+                "max_length": 30,
+                "regex": r"^[A-Z0-9_-]+$",
+                "error_msg": "EXTERNAL_IDENTIFIER_NUMBER must be alphanumeric with underscores/dashes, 1-30 chars",
+            },
+            "EXTERNAL_IDENTIFIER_TYPE": {
+                "required": True,
+                "min_length": 1,
+                "max_length": 30,
+                "regex": r"^[A-Z0-9_]+$",
+                "error_msg": "EXTERNAL_IDENTIFIER_TYPE must be uppercase alphanumeric/underscore, 1-30 chars",
+            },
+            "DATE_FROM": {
+                "required": True,
+                "data_type": "date",
+                "error_msg": "DATE_FROM must be a valid date",
+            },
+            "DATE_TO": {
+                "required": False,
+                "data_type": "date",
+                "error_msg": "DATE_TO must be a valid date",
+            },
+            "GUID": {
+                "required": False,
+                "min_length": 1,
+                "max_length": 64,
+                "regex": r"^[A-Za-z0-9_\-]+$",
+                "error_msg": "GUID must be alphanumeric with underscores/dashes, 1-64 chars",
+            },
+            "COMMENTS": {
+                "required": False,
+                "min_length": 1,
+                "max_length": 240,
+                "error_msg": "COMMENTS must be 1-240 chars",
+            },
+            "ASSIGNMENT_NUMBER": {
+                "required": False,
+                "min_length": 1,
+                "max_length": 30,
+                "regex": r"^[A-Z0-9_-]+$",
+                "error_msg": "ASSIGNMENT_NUMBER must be alphanumeric with underscores/dashes, 1-30 chars",
+            },
+        },
+        default_source_system_owner="HCMQA-001",
+        default_source_system_id="EXT_IDENTIFIER_{row_index}",
+        output_filename_template="ExternalIdentifier.dat",
+        output_header="METADATA|ExternalIdentifier|SourceSystemOwner|SourceSystemId|PersonNumber|ExternalIdentifierSequence|ExternalIdentifierNumber|ExternalIdentifierType|DateFrom|DateTo|GUID|Comments|AssignmentNumber",
+        output_template=(
+            "MERGE|ExternalIdentifier|{SOURCE_SYSTEM_OWNER}|{SOURCE_SYSTEM_ID}|"
+            "{PERSON_NUMBER}|{EXTERNAL_IDENTIFIER_SEQUENCE}|"
+            "{EXTERNAL_IDENTIFIER_NUMBER}|{EXTERNAL_IDENTIFIER_TYPE}|"
+            "{DATE_FROM}|{DATE_TO}|"
+            "{GUID}|{COMMENTS}|{ASSIGNMENT_NUMBER}"
+        ),
+        description="External Identifier object migration file for Oracle Fusion HCM Workforce Structures.",
+    ),
+
+    "PersonAddress": ObjectDefinition( # type: ignore
+        name="PersonAddress",
+        aliases=["person_address", "personaddress", "address", "addresses", "person address"],
+        required_columns=[
+            "SOURCE_SYSTEM_OWNER",
+            "SOURCE_SYSTEM_ID",
+            "PERSON_NUMBER",
+            "ADDRESS_LINE1",
+            "EFFECTIVE_START_DATE",
+            "COUNTRY",
+        ],
+        optional_columns=[
+            "ADDRESS_ID",
+            "ADDRESS_TYPE",
+            "LONGITUDE",
+            "LATITUDE",
+            "EFFECTIVE_END_DATE",
+            "ADDRESS_LINE2",
+            "ADDRESS_LINE3",
+            "ADDRESS_LINE4",
+            "BUILDING",
+            "FLOOR_NUMBER",
+            "TOWN_OR_CITY",
+            "REGION1",
+            "REGION2",
+            "REGION3",
+            "POSTAL_CODE",
+            "LONG_POSTAL_CODE",
+            "PRIMARY_FLAG",
+            "GUID",
+            "VALIDATION_STATUS_CODE",
+            "PROVIDER",
+        ],
+        unique_columns=[
+            "PERSON_NUMBER",
+            "ADDRESS_ID",
+            "SOURCE_SYSTEM_ID",
+        ],
+        date_columns=[
+            "EFFECTIVE_START_DATE",
+            "EFFECTIVE_END_DATE",
+        ],
+        column_aliases={
+            "SOURCE_SYSTEM_OWNER": ["SourceSystemOwner", "source_system_owner"],
+            "SOURCE_SYSTEM_ID": ["SourceSystemId", "source_system_id"],
+            "PERSON_NUMBER": ["PersonNumber", "person_number", "Person_Number"],
+            "ADDRESS_LINE1": [
+                "AddressLine1", "address_line1", "Address_Line1",
+                "AddressLine_1", "address_line_1",
+            ],
+            "EFFECTIVE_START_DATE": ["EffectiveStartDate", "effective_start_date", "StartDate", "start_date"],
+            "EFFECTIVE_END_DATE": ["EffectiveEndDate", "effective_end_date", "EndDate", "end_date"],
+            "COUNTRY": ["Country", "country", "CountryCode", "country_code"],
+            "ADDRESS_ID": ["AddressId", "address_id", "Address_Id", "AddrId", "addr_id"],
+            "ADDRESS_TYPE": [
+                "AddressType", "address_type", "Address_Type",
+                "AddrType", "addr_type",
+            ],
+            "LONGITUDE": ["Longitude", "longitude", "Long", "long"],
+            "LATITUDE": ["Latitude", "latitude", "Lat", "lat"],
+            "ADDRESS_LINE2": [
+                "AddressLine2", "address_line2", "Address_Line2",
+                "AddressLine_2", "address_line_2",
+            ],
+            "ADDRESS_LINE3": [
+                "AddressLine3", "address_line3", "Address_Line3",
+                "AddressLine_3", "address_line_3",
+            ],
+            "ADDRESS_LINE4": [
+                "AddressLine4", "address_line4", "Address_Line4",
+                "AddressLine_4", "address_line_4",
+            ],
+            "BUILDING": ["Building", "building", "BuildingName", "building_name"],
+            "FLOOR_NUMBER": ["FloorNumber", "floor_number", "Floor_Number", "Floor", "floor"],
+            "TOWN_OR_CITY": [
+                "TownOrCity", "town_or_city", "Town_Or_City",
+                "City", "city", "Town", "town",
+            ],
+            "REGION1": ["Region1", "region1", "Region_1", "State", "state", "Province", "province"],
+            "REGION2": ["Region2", "region2", "Region_2", "County", "county", "District", "district"],
+            "REGION3": ["Region3", "region3", "Region_3"],
+            "POSTAL_CODE": [
+                "PostalCode", "postal_code", "Postal_Code",
+                "ZipCode", "zip_code", "Zip", "zip", "Pincode", "pincode",
+            ],
+            "LONG_POSTAL_CODE": [
+                "LongPostalCode", "long_postal_code", "Long_Postal_Code",
+                "ExtendedPostalCode", "extended_postal_code",
+            ],
+            "PRIMARY_FLAG": ["PrimaryFlag", "primary_flag", "Primary_Flag", "IsPrimary", "is_primary"],
+            "GUID": ["GUID", "guid", "GlobalUniqueIdentifier", "global_unique_identifier"],
+            "VALIDATION_STATUS_CODE": [
+                "ValidationStatusCode", "validation_status_code",
+                "Validation_Status_Code", "ValidationStatus", "validation_status",
+            ],
+            "PROVIDER": ["Provider", "provider", "AddressProvider", "address_provider"],
+        },
+        validation_rules={
+            "SOURCE_SYSTEM_OWNER": {
+                "required": False,
+                "min_length": 1,
+                "max_length": 30,
+                "regex": r"^[A-Z0-9_]+$",
+                "error_msg": "SOURCE_SYSTEM_OWNER must be uppercase alphanumeric/underscore, 1-30 chars",
+            },
+            "SOURCE_SYSTEM_ID": {
+                "required": False,
+                "min_length": 1,
+                "max_length": 30,
+                "regex": r"^[A-Z0-9_-]+$",
+                "error_msg": "SOURCE_SYSTEM_ID must be alphanumeric with underscores/dashes, 1-30 chars",
+            },
+            "PERSON_NUMBER": {
+                "required": True,
+                "min_length": 1,
+                "max_length": 30,
+                "regex": r"^[A-Z0-9_-]+$",
+                "error_msg": "PERSON_NUMBER must be alphanumeric with underscores/dashes, 1-30 chars",
+            },
+            "ADDRESS_LINE1": {
+                "required": True,
+                "min_length": 1,
+                "max_length": 240,
+                "error_msg": "ADDRESS_LINE1 must be 1-240 chars",
+            },
+            "EFFECTIVE_START_DATE": {
+                "required": True,
+                "data_type": "date",
+                "error_msg": "EFFECTIVE_START_DATE must be a valid date",
+            },
+            "COUNTRY": {
+                "required": True,
+                "min_length": 2,
+                "max_length": 2,
+                "regex": r"^[A-Z]{2}$",
+                "error_msg": "COUNTRY must be a 2-letter ISO country code (e.g. IN, US, GB)",
+            },
+            "ADDRESS_ID": {
+                "required": False,
+                "min_length": 1,
+                "max_length": 30,
+                "regex": r"^[A-Z0-9_-]+$",
+                "error_msg": "ADDRESS_ID must be alphanumeric with underscores/dashes, 1-30 chars",
+            },
+            "ADDRESS_TYPE": {
+                "required": False,
+                "min_length": 1,
+                "max_length": 30,
+                "regex": r"^[A-Z0-9_]+$",
+                "error_msg": "ADDRESS_TYPE must be uppercase alphanumeric/underscore, 1-30 chars",
+            },
+            "LONGITUDE": {
+                "required": False,
+                "min_length": 1,
+                "max_length": 30,
+                "regex": r"^-?[0-9]{1,3}(\.[0-9]+)?$",
+                "error_msg": "LONGITUDE must be a valid decimal number between -180 and 180",
+            },
+            "LATITUDE": {
+                "required": False,
+                "min_length": 1,
+                "max_length": 30,
+                "regex": r"^-?[0-9]{1,2}(\.[0-9]+)?$",
+                "error_msg": "LATITUDE must be a valid decimal number between -90 and 90",
+            },
+            "EFFECTIVE_END_DATE": {
+                "required": False,
+                "data_type": "date",
+                "error_msg": "EFFECTIVE_END_DATE must be a valid date",
+            },
+            "ADDRESS_LINE2": {
+                "required": False,
+                "min_length": 1,
+                "max_length": 240,
+                "error_msg": "ADDRESS_LINE2 must be 1-240 chars",
+            },
+            "ADDRESS_LINE3": {
+                "required": False,
+                "min_length": 1,
+                "max_length": 240,
+                "error_msg": "ADDRESS_LINE3 must be 1-240 chars",
+            },
+            "ADDRESS_LINE4": {
+                "required": False,
+                "min_length": 1,
+                "max_length": 240,
+                "error_msg": "ADDRESS_LINE4 must be 1-240 chars",
+            },
+            "BUILDING": {
+                "required": False,
+                "min_length": 1,
+                "max_length": 240,
+                "error_msg": "BUILDING must be 1-240 chars",
+            },
+            "FLOOR_NUMBER": {
+                "required": False,
+                "min_length": 1,
+                "max_length": 30,
+                "error_msg": "FLOOR_NUMBER must be 1-30 chars",
+            },
+            "TOWN_OR_CITY": {
+                "required": False,
+                "min_length": 1,
+                "max_length": 30,
+                "error_msg": "TOWN_OR_CITY must be 1-30 chars",
+            },
+            "REGION1": {
+                "required": False,
+                "min_length": 1,
+                "max_length": 30,
+                "error_msg": "REGION1 must be 1-30 chars",
+            },
+            "REGION2": {
+                "required": False,
+                "min_length": 1,
+                "max_length": 30,
+                "error_msg": "REGION2 must be 1-30 chars",
+            },
+            "REGION3": {
+                "required": False,
+                "min_length": 1,
+                "max_length": 30,
+                "error_msg": "REGION3 must be 1-30 chars",
+            },
+            "POSTAL_CODE": {
+                "required": False,
+                "min_length": 1,
+                "max_length": 30,
+                "error_msg": "POSTAL_CODE must be 1-30 chars",
+            },
+            "LONG_POSTAL_CODE": {
+                "required": False,
+                "min_length": 1,
+                "max_length": 30,
+                "error_msg": "LONG_POSTAL_CODE must be 1-30 chars",
+            },
+            "PRIMARY_FLAG": {
+                "required": False,
+                "regex": r"^[YN]$",
+                "error_msg": "PRIMARY_FLAG must be Y (Yes) or N (No)",
+            },
+            "GUID": {
+                "required": False,
+                "min_length": 1,
+                "max_length": 64,
+                "regex": r"^[A-Za-z0-9_\-]+$",
+                "error_msg": "GUID must be alphanumeric with underscores/dashes, 1-64 chars",
+            },
+            "VALIDATION_STATUS_CODE": {
+                "required": False,
+                "min_length": 1,
+                "max_length": 30,
+                "regex": r"^[A-Z0-9_]+$",
+                "error_msg": "VALIDATION_STATUS_CODE must be uppercase alphanumeric/underscore, 1-30 chars",
+            },
+            "PROVIDER": {
+                "required": False,
+                "min_length": 1,
+                "max_length": 30,
+                "error_msg": "PROVIDER must be 1-30 chars",
+            },
+        },
+        default_source_system_owner="HCMQA-001",
+        default_source_system_id="PERSON_ADDRESS_{row_index}",
+        output_filename_template="PersonAddress.dat",
+        output_header="METADATA|PersonAddress|SourceSystemOwner|SourceSystemId|PersonNumber|AddressLine1|EffectiveStartDate|EffectiveEndDate|Country|AddressId|AddressType|Longitude|Latitude|AddressLine2|AddressLine3|AddressLine4|Building|FloorNumber|TownOrCity|Region1|Region2|Region3|PostalCode|LongPostalCode|PrimaryFlag|GUID|ValidationStatusCode|Provider",
+        output_template=(
+            "MERGE|PersonAddress|{SOURCE_SYSTEM_OWNER}|{SOURCE_SYSTEM_ID}|"
+            "{PERSON_NUMBER}|{ADDRESS_LINE1}|"
+            "{EFFECTIVE_START_DATE}|{EFFECTIVE_END_DATE}|"
+            "{COUNTRY}|{ADDRESS_ID}|{ADDRESS_TYPE}|"
+            "{LONGITUDE}|{LATITUDE}|"
+            "{ADDRESS_LINE2}|{ADDRESS_LINE3}|{ADDRESS_LINE4}|"
+            "{BUILDING}|{FLOOR_NUMBER}|"
+            "{TOWN_OR_CITY}|{REGION1}|{REGION2}|{REGION3}|"
+            "{POSTAL_CODE}|{LONG_POSTAL_CODE}|"
+            "{PRIMARY_FLAG}|{GUID}|{VALIDATION_STATUS_CODE}|{PROVIDER}"
+        ),
+        description="Person Address object migration file for Oracle Fusion HCM Workforce Structures.",
+    ),
+
+    "PersonLegislativeData": ObjectDefinition( # type: ignore
+        name="PersonLegislativeData",
+        aliases=["person_legislative_data", "personlegislativedata", "legislative_data", "person legislative data"],
+        required_columns=[
+            "SOURCE_SYSTEM_OWNER",
+            "SOURCE_SYSTEM_ID",
+            "PERSON_NUMBER",
+            "LEGISLATION_CODE",
+        ],
+        optional_columns=[
+            "GUID",
+            "EFFECTIVE_END_DATE",
+            "HIGHEST_EDUCATION_LEVEL",
+            "EFFECTIVE_START_DATE",
+            "MARITAL_STATUS",
+            "MARITAL_STATUS_DATE",
+            "SEX",
+        ],
+        unique_columns=[
+            "PERSON_NUMBER",
+            "LEGISLATION_CODE",
+            "SOURCE_SYSTEM_ID",
+        ],
+        date_columns=[
+            "EFFECTIVE_START_DATE",
+            "EFFECTIVE_END_DATE",
+            "MARITAL_STATUS_DATE",
+        ],
+        column_aliases={
+            "SOURCE_SYSTEM_OWNER": ["SourceSystemOwner", "source_system_owner"],
+            "SOURCE_SYSTEM_ID": ["SourceSystemId", "source_system_id"],
+            "PERSON_NUMBER": ["PersonNumber", "person_number", "Person_Number"],
+            "LEGISLATION_CODE": [
+                "LegislationCode", "legislation_code", "Legislation_Code",
+                "LegCode", "leg_code",
+            ],
+            "GUID": ["GUID", "guid", "GlobalUniqueIdentifier", "global_unique_identifier"],
+            "EFFECTIVE_START_DATE": ["EffectiveStartDate", "effective_start_date", "StartDate", "start_date"],
+            "EFFECTIVE_END_DATE": ["EffectiveEndDate", "effective_end_date", "EndDate", "end_date"],
+            "HIGHEST_EDUCATION_LEVEL": [
+                "HighestEducationLevel", "highest_education_level",
+                "Highest_Education_Level", "EducationLevel", "education_level",
+            ],
+            "MARITAL_STATUS": [
+                "MaritalStatus", "marital_status", "Marital_Status",
+                "MarStatus", "mar_status",
+            ],
+            "MARITAL_STATUS_DATE": [
+                "MaritalStatusDate", "marital_status_date",
+                "Marital_Status_Date", "MarStatusDate", "mar_status_date",
+            ],
+            "SEX": ["Sex", "sex", "Gender", "gender", "GenderCode", "gender_code"],
+        },
+        validation_rules={
+            "SOURCE_SYSTEM_OWNER": {
+                "required": False,
+                "min_length": 1,
+                "max_length": 30,
+                "regex": r"^[A-Z0-9_]+$",
+                "error_msg": "SOURCE_SYSTEM_OWNER must be uppercase alphanumeric/underscore, 1-30 chars",
+            },
+            "SOURCE_SYSTEM_ID": {
+                "required": False,
+                "min_length": 1,
+                "max_length": 30,
+                "regex": r"^[A-Z0-9_-]+$",
+                "error_msg": "SOURCE_SYSTEM_ID must be alphanumeric with underscores/dashes, 1-30 chars",
+            },
+            "PERSON_NUMBER": {
+                "required": True,
+                "min_length": 1,
+                "max_length": 30,
+                "regex": r"^[A-Z0-9_-]+$",
+                "error_msg": "PERSON_NUMBER must be alphanumeric with underscores/dashes, 1-30 chars",
+            },
+            "LEGISLATION_CODE": {
+                "required": True,
+                "min_length": 2,
+                "max_length": 2,
+                "regex": r"^[A-Z]{2}$",
+                "error_msg": "LEGISLATION_CODE must be a 2-letter ISO country code (e.g. IN, US, GB)",
+            },
+            "GUID": {
+                "required": False,
+                "min_length": 1,
+                "max_length": 64,
+                "regex": r"^[A-Za-z0-9_\-]+$",
+                "error_msg": "GUID must be alphanumeric with underscores/dashes, 1-64 chars",
+            },
+            "EFFECTIVE_START_DATE": {
+                "required": False,
+                "data_type": "date",
+                "error_msg": "EFFECTIVE_START_DATE must be a valid date",
+            },
+            "EFFECTIVE_END_DATE": {
+                "required": False,
+                "data_type": "date",
+                "error_msg": "EFFECTIVE_END_DATE must be a valid date",
+            },
+            "HIGHEST_EDUCATION_LEVEL": {
+                "required": False,
+                "min_length": 1,
+                "max_length": 30,
+                "regex": r"^[A-Z0-9_]+$",
+                "error_msg": "HIGHEST_EDUCATION_LEVEL must be uppercase alphanumeric/underscore, 1-30 chars",
+            },
+            "MARITAL_STATUS": {
+                "required": False,
+                "min_length": 1,
+                "max_length": 30,
+                "regex": r"^[A-Z0-9_]+$",
+                "error_msg": "MARITAL_STATUS must be uppercase alphanumeric/underscore, 1-30 chars",
+            },
+            "MARITAL_STATUS_DATE": {
+                "required": False,
+                "data_type": "date",
+                "error_msg": "MARITAL_STATUS_DATE must be a valid date",
+            },
+            "SEX": {
+                "required": False,
+                "min_length": 1,
+                "max_length": 30,
+                "regex": r"^[A-Z0-9_]+$",
+                "error_msg": "SEX must be uppercase alphanumeric/underscore, 1-30 chars (e.g. M, F, ORA_INTERSEX)",
+            },
+        },
+        default_source_system_owner="HCMQA-001",
+        default_source_system_id="PERSON_LEG_{row_index}",
+        output_filename_template="PersonLegislativeData.dat",
+        output_header="METADATA|PersonLegislativeData|SourceSystemOwner|SourceSystemId|PersonNumber|LegislationCode|EffectiveStartDate|EffectiveEndDate|GUID|HighestEducationLevel|MaritalStatus|MaritalStatusDate|Sex",
+        output_template=(
+            "MERGE|PersonLegislativeData|{SOURCE_SYSTEM_OWNER}|{SOURCE_SYSTEM_ID}|"
+            "{PERSON_NUMBER}|{LEGISLATION_CODE}|"
+            "{EFFECTIVE_START_DATE}|{EFFECTIVE_END_DATE}|"
+            "{GUID}|{HIGHEST_EDUCATION_LEVEL}|"
+            "{MARITAL_STATUS}|{MARITAL_STATUS_DATE}|"
+            "{SEX}"
+        ),
+        description="Person Legislative Data object migration file for Oracle Fusion HCM Workforce Structures.",
+    ),
+
+    "PersonName": ObjectDefinition( # type: ignore
+        name="PersonName",
+        aliases=["person_name", "personname", "name", "person name"],
+        required_columns=[
+            "SOURCE_SYSTEM_OWNER",
+            "SOURCE_SYSTEM_ID",
+            "PERSON_NUMBER",
+            "NAME_TYPE",
+            "EFFECTIVE_START_DATE",
+            "LAST_NAME",
+            "LEGISLATION_CODE",
+        ],
+        optional_columns=[
+            "GUID",
+            "CHAR_SET_CONTEXT",
+            "TITLE",
+            "SUFFIX",
+            "PREVIOUS_LAST_NAME",
+            "MILITARY_RANK",
+            "PRE_NAME_ADJUNCT",
+            "KNOWN_AS",
+            "HONORS",
+            "MIDDLE_NAMES",
+            "FIRST_NAME",
+            "EFFECTIVE_END_DATE",
+        ],
+        unique_columns=[
+            "PERSON_NUMBER",
+            "NAME_TYPE",
+            "SOURCE_SYSTEM_ID",
+        ],
+        date_columns=[
+            "EFFECTIVE_START_DATE",
+            "EFFECTIVE_END_DATE",
+        ],
+        column_aliases={
+            "SOURCE_SYSTEM_OWNER": ["SourceSystemOwner", "source_system_owner"],
+            "SOURCE_SYSTEM_ID": ["SourceSystemId", "source_system_id"],
+            "PERSON_NUMBER": ["PersonNumber", "person_number", "Person_Number"],
+            "NAME_TYPE": ["NameType", "name_type", "Name_Type", "NameTypCode", "name_type_code"],
+            "EFFECTIVE_START_DATE": ["EffectiveStartDate", "effective_start_date", "StartDate", "start_date"],
+            "EFFECTIVE_END_DATE": ["EffectiveEndDate", "effective_end_date", "EndDate", "end_date"],
+            "LAST_NAME": [
+                "LastName", "last_name", "Last_Name",
+                "Surname", "surname", "FamilyName", "family_name",
+            ],
+            "LEGISLATION_CODE": [
+                "LegislationCode", "legislation_code", "Legislation_Code",
+                "LegCode", "leg_code",
+            ],
+            "GUID": ["GUID", "guid", "GlobalUniqueIdentifier", "global_unique_identifier"],
+            "CHAR_SET_CONTEXT": [
+                "CharSetContext", "char_set_context", "Char_Set_Context",
+                "CharacterSetContext", "character_set_context",
+            ],
+            "TITLE": ["Title", "title", "Salutation", "salutation"],
+            "SUFFIX": ["Suffix", "suffix", "NameSuffix", "name_suffix"],
+            "PREVIOUS_LAST_NAME": [
+                "PreviousLastName", "previous_last_name", "Previous_Last_Name",
+                "MaidenName", "maiden_name", "PrevLastName", "prev_last_name",
+            ],
+            "MILITARY_RANK": [
+                "MilitaryRank", "military_rank", "Military_Rank",
+                "MilRank", "mil_rank",
+            ],
+            "PRE_NAME_ADJUNCT": [
+                "PreNameAdjunct", "pre_name_adjunct", "Pre_Name_Adjunct",
+                "PreName", "pre_name",
+            ],
+            "KNOWN_AS": ["KnownAs", "known_as", "Known_As", "PreferredName", "preferred_name"],
+            "HONORS": ["Honors", "honors", "Honours", "honours", "Honour", "honor"],
+            "MIDDLE_NAMES": [
+                "MiddleNames", "middle_names", "Middle_Names",
+                "MiddleName", "middle_name",
+            ],
+            "FIRST_NAME": [
+                "FirstName", "first_name", "First_Name",
+                "GivenName", "given_name",
+            ],
+        },
+        validation_rules={
+            "SOURCE_SYSTEM_OWNER": {
+                "required": False,
+                "min_length": 1,
+                "max_length": 30,
+                "regex": r"^[A-Z0-9_]+$",
+                "error_msg": "SOURCE_SYSTEM_OWNER must be uppercase alphanumeric/underscore, 1-30 chars",
+            },
+            "SOURCE_SYSTEM_ID": {
+                "required": False,
+                "min_length": 1,
+                "max_length": 30,
+                "regex": r"^[A-Z0-9_-]+$",
+                "error_msg": "SOURCE_SYSTEM_ID must be alphanumeric with underscores/dashes, 1-30 chars",
+            },
+            "PERSON_NUMBER": {
+                "required": True,
+                "min_length": 1,
+                "max_length": 30,
+                "regex": r"^[A-Z0-9_-]+$",
+                "error_msg": "PERSON_NUMBER must be alphanumeric with underscores/dashes, 1-30 chars",
+            },
+            "NAME_TYPE": {
+                "required": True,
+                "min_length": 1,
+                "max_length": 30,
+                "regex": r"^[A-Z0-9_]+$",
+                "error_msg": "NAME_TYPE must be uppercase alphanumeric/underscore, 1-30 chars",
+            },
+            "EFFECTIVE_START_DATE": {
+                "required": True,
+                "data_type": "date",
+                "error_msg": "EFFECTIVE_START_DATE must be a valid date",
+            },
+            "LAST_NAME": {
+                "required": True,
+                "min_length": 1,
+                "max_length": 150,
+                "error_msg": "LAST_NAME must be 1-150 chars",
+            },
+            "LEGISLATION_CODE": {
+                "required": True,
+                "min_length": 2,
+                "max_length": 2,
+                "regex": r"^[A-Z]{2}$",
+                "error_msg": "LEGISLATION_CODE must be a 2-letter ISO country code (e.g. IN, US, GB)",
+            },
+            "GUID": {
+                "required": False,
+                "min_length": 1,
+                "max_length": 64,
+                "regex": r"^[A-Za-z0-9_\-]+$",
+                "error_msg": "GUID must be alphanumeric with underscores/dashes, 1-64 chars",
+            },
+            "CHAR_SET_CONTEXT": {
+                "required": False,
+                "min_length": 1,
+                "max_length": 30,
+                "regex": r"^[A-Z0-9_]+$",
+                "error_msg": "CHAR_SET_CONTEXT must be uppercase alphanumeric/underscore, 1-30 chars",
+            },
+            "TITLE": {
+                "required": False,
+                "min_length": 1,
+                "max_length": 30,
+                "regex": r"^[A-Z0-9_]+$",
+                "error_msg": "TITLE must be uppercase alphanumeric/underscore, 1-30 chars",
+            },
+            "SUFFIX": {
+                "required": False,
+                "min_length": 1,
+                "max_length": 30,
+                "error_msg": "SUFFIX must be 1-30 chars",
+            },
+            "PREVIOUS_LAST_NAME": {
+                "required": False,
+                "min_length": 1,
+                "max_length": 150,
+                "error_msg": "PREVIOUS_LAST_NAME must be 1-150 chars",
+            },
+            "MILITARY_RANK": {
+                "required": False,
+                "min_length": 1,
+                "max_length": 30,
+                "regex": r"^[A-Z0-9_]+$",
+                "error_msg": "MILITARY_RANK must be uppercase alphanumeric/underscore, 1-30 chars",
+            },
+            "PRE_NAME_ADJUNCT": {
+                "required": False,
+                "min_length": 1,
+                "max_length": 30,
+                "error_msg": "PRE_NAME_ADJUNCT must be 1-30 chars",
+            },
+            "KNOWN_AS": {
+                "required": False,
+                "min_length": 1,
+                "max_length": 80,
+                "error_msg": "KNOWN_AS must be 1-80 chars",
+            },
+            "HONORS": {
+                "required": False,
+                "min_length": 1,
+                "max_length": 30,
+                "error_msg": "HONORS must be 1-30 chars",
+            },
+            "MIDDLE_NAMES": {
+                "required": False,
+                "min_length": 1,
+                "max_length": 60,
+                "error_msg": "MIDDLE_NAMES must be 1-60 chars",
+            },
+            "FIRST_NAME": {
+                "required": False,
+                "min_length": 1,
+                "max_length": 150,
+                "error_msg": "FIRST_NAME must be 1-150 chars",
+            },
+            "EFFECTIVE_END_DATE": {
+                "required": False,
+                "data_type": "date",
+                "error_msg": "EFFECTIVE_END_DATE must be a valid date",
+            },
+        },
+        default_source_system_owner="HCMQA-001",
+        default_source_system_id="PERSON_NAME_{row_index}",
+        output_filename_template="PersonName.dat",
+        output_header="METADATA|PersonName|SourceSystemOwner|SourceSystemId|PersonNumber|NameType|EffectiveStartDate|EffectiveEndDate|LastName|LegislationCode|GUID|CharSetContext|Title|Suffix|PreviousLastName|MilitaryRank|PreNameAdjunct|KnownAs|Honors|MiddleNames|FirstName",
+        output_template=(
+            "MERGE|PersonName|{SOURCE_SYSTEM_OWNER}|{SOURCE_SYSTEM_ID}|"
+            "{PERSON_NUMBER}|{NAME_TYPE}|"
+            "{EFFECTIVE_START_DATE}|{EFFECTIVE_END_DATE}|"
+            "{LAST_NAME}|{LEGISLATION_CODE}|"
+            "{GUID}|{CHAR_SET_CONTEXT}|"
+            "{TITLE}|{SUFFIX}|{PREVIOUS_LAST_NAME}|"
+            "{MILITARY_RANK}|{PRE_NAME_ADJUNCT}|"
+            "{KNOWN_AS}|{HONORS}|{MIDDLE_NAMES}|{FIRST_NAME}"
+        ),
+        description="Person Name object migration file for Oracle Fusion HCM Workforce Structures.",
+    ),
+
+    "WorkRelationship": ObjectDefinition( # type: ignore
+        name="WorkRelationship",
+        aliases=["work_relationship", "workrelationship", "work relationship", "employment"],
+        required_columns=[
+            "SOURCE_SYSTEM_OWNER",
+            "SOURCE_SYSTEM_ID",
+            "PERSON_NUMBER",
+            "DATE_START",
+            "WORKER_TYPE",
+            "LEGAL_EMPLOYER_NAME",
+            "PRIMARY_FLAG",
+        ],
+        optional_columns=[
+            "ACTION_CODE",
+            "ACTUAL_TERMINATION_DATE",
+            "CANCEL_WORK_RELATIONSHIP_FLAG",
+            "COMMENTS",
+            "CORRECT_TERMINATION_FLAG",
+            "DATE_FOR_PRIMARY_FLAG_CHANGE",
+            "DATE_OF_DEATH",
+            "ENTERPRISE_SENIORITY_DATE",
+            "GLOBAL_TRANSFER_FLAG",
+            "HIDE_UNTIL_DATE",
+            "LAST_WORKING_DATE",
+            "LEGAL_EMPLOYER_SENIORITY_DATE",
+            "NEW_START_DATE",
+            "NOTIFIED_TERMINATION_DATE",
+            "PROJECTED_TERMINATION_DATE",
+            "READY_TO_CONVERT",
+            "REASON_CODE",
+            "REHIRE_AUTHORIZER_PERSON_ID",
+            "REHIRE_AUTHORIZOR",
+            "REHIRE_REASON",
+            "REVERSE_TERMINATION_FLAG",
+            "REVOKE_USER_ACCESS",
+            "TERMINATE_WORK_RELATIONSHIP_FLAG",
+            "WORKER_COMMENTS",
+            "WORKER_NUMBER",
+            "GUID",
+        ],
+        unique_columns=[
+            "PERSON_NUMBER",
+            "DATE_START",
+            "SOURCE_SYSTEM_ID",
+        ],
+        date_columns=[
+            "DATE_START",
+            "ACTUAL_TERMINATION_DATE",
+            "DATE_FOR_PRIMARY_FLAG_CHANGE",
+            "DATE_OF_DEATH",
+            "ENTERPRISE_SENIORITY_DATE",
+            "HIDE_UNTIL_DATE",
+            "LAST_WORKING_DATE",
+            "LEGAL_EMPLOYER_SENIORITY_DATE",
+            "NEW_START_DATE",
+            "NOTIFIED_TERMINATION_DATE",
+            "PROJECTED_TERMINATION_DATE",
+        ],
+        column_aliases={
+            "SOURCE_SYSTEM_OWNER": ["SourceSystemOwner", "source_system_owner"],
+            "SOURCE_SYSTEM_ID": ["SourceSystemId", "source_system_id"],
+            "PERSON_NUMBER": ["PersonNumber", "person_number", "Person_Number"],
+            "DATE_START": ["DateStart", "date_start", "Date_Start", "StartDate", "start_date", "HireDate", "hire_date"],
+            "WORKER_TYPE": ["WorkerType", "worker_type", "Worker_Type", "EmployeeType", "employee_type"],
+            "LEGAL_EMPLOYER_NAME": [
+                "LegalEmployerName", "legal_employer_name", "Legal_Employer_Name",
+                "LegalEmployer", "legal_employer",
+            ],
+            "PRIMARY_FLAG": ["PrimaryFlag", "primary_flag", "Primary_Flag", "IsPrimary", "is_primary"],
+            "ACTION_CODE": ["ActionCode", "action_code", "Action_Code"],
+            "ACTUAL_TERMINATION_DATE": [
+                "ActualTerminationDate", "actual_termination_date",
+                "Actual_Termination_Date", "TerminationDate", "termination_date",
+            ],
+            "CANCEL_WORK_RELATIONSHIP_FLAG": [
+                "CancelWorkRelationshipFlag", "cancel_work_relationship_flag",
+                "Cancel_Work_Relationship_Flag", "CancelFlag", "cancel_flag",
+            ],
+            "COMMENTS": ["Comments", "comments", "Comment", "comment", "Notes", "notes"],
+            "CORRECT_TERMINATION_FLAG": [
+                "CorrectTerminationFlag", "correct_termination_flag",
+                "Correct_Termination_Flag", "CorrectTermFlag", "correct_term_flag",
+            ],
+            "DATE_FOR_PRIMARY_FLAG_CHANGE": [
+                "DateForPrimaryFlagChange", "date_for_primary_flag_change",
+                "Date_For_Primary_Flag_Change", "PrimaryFlagChangeDate", "primary_flag_change_date",
+            ],
+            "DATE_OF_DEATH": [
+                "DateOfDeath", "date_of_death", "Date_Of_Death",
+                "DOD", "dod", "DeathDate", "death_date",
+            ],
+            "ENTERPRISE_SENIORITY_DATE": [
+                "EnterpriseSeniorityDate", "enterprise_seniority_date",
+                "Enterprise_Seniority_Date", "SeniorityDate", "seniority_date",
+            ],
+            "GLOBAL_TRANSFER_FLAG": [
+                "GlobalTransferFlag", "global_transfer_flag",
+                "Global_Transfer_Flag", "GlobalTransfer", "global_transfer",
+            ],
+            "HIDE_UNTIL_DATE": [
+                "HideUntilDate", "hide_until_date", "Hide_Until_Date",
+                "HideDate", "hide_date",
+            ],
+            "LAST_WORKING_DATE": [
+                "LastWorkingDate", "last_working_date", "Last_Working_Date",
+                "LastDayWorked", "last_day_worked",
+            ],
+            "LEGAL_EMPLOYER_SENIORITY_DATE": [
+                "LegalEmployerSeniorityDate", "legal_employer_seniority_date",
+                "Legal_Employer_Seniority_Date", "LegalEmpSeniorityDate", "legal_emp_seniority_date",
+            ],
+            "NEW_START_DATE": [
+                "NewStartDate", "new_start_date", "New_Start_Date",
+                "RevisedStartDate", "revised_start_date",
+            ],
+            "NOTIFIED_TERMINATION_DATE": [
+                "NotifiedTerminationDate", "notified_termination_date",
+                "Notified_Termination_Date", "NoticeDate", "notice_date",
+            ],
+            "PROJECTED_TERMINATION_DATE": [
+                "ProjectedTerminationDate", "projected_termination_date",
+                "Projected_Termination_Date", "ProjectedTermDate", "projected_term_date",
+            ],
+            "READY_TO_CONVERT": [
+                "ReadyToConvert", "ready_to_convert", "Ready_To_Convert",
+                "ConvertFlag", "convert_flag",
+            ],
+            "REASON_CODE": ["ReasonCode", "reason_code", "Reason_Code", "ActionReasonCode", "action_reason_code"],
+            "REHIRE_AUTHORIZER_PERSON_ID": [
+                "RehireAuthorizerPersonId", "rehire_authorizer_person_id",
+                "Rehire_Authorizer_Person_Id", "RehireAuthorizerId", "rehire_authorizer_id",
+            ],
+            "REHIRE_AUTHORIZOR": [
+                "RehireAuthorizor", "rehire_authorizor", "Rehire_Authorizor",
+                "RehireAuthorizer", "rehire_authorizer",
+            ],
+            "REHIRE_REASON": [
+                "RehireReason", "rehire_reason", "Rehire_Reason",
+                "RehireReasonCode", "rehire_reason_code",
+            ],
+            "REVERSE_TERMINATION_FLAG": [
+                "ReverseTerminationFlag", "reverse_termination_flag",
+                "Reverse_Termination_Flag", "ReverseTermFlag", "reverse_term_flag",
+            ],
+            "REVOKE_USER_ACCESS": [
+                "RevokeUserAccess", "revoke_user_access", "Revoke_User_Access",
+                "RevokeAccess", "revoke_access",
+            ],
+            "TERMINATE_WORK_RELATIONSHIP_FLAG": [
+                "TerminateWorkRelationshipFlag", "terminate_work_relationship_flag",
+                "Terminate_Work_Relationship_Flag", "TerminateFlag", "terminate_flag",
+            ],
+            "WORKER_COMMENTS": [
+                "WorkerComments", "worker_comments", "Worker_Comments",
+                "EmpComments", "emp_comments",
+            ],
+            "WORKER_NUMBER": [
+                "WorkerNumber", "worker_number", "Worker_Number",
+                "EmployeeNumber", "employee_number",
+            ],
+            "GUID": ["GUID", "guid", "GlobalUniqueIdentifier", "global_unique_identifier"],
+        },
+        validation_rules={
+            "SOURCE_SYSTEM_OWNER": {
+                "required": False,
+                "min_length": 1,
+                "max_length": 30,
+                "regex": r"^[A-Z0-9_]+$",
+                "error_msg": "SOURCE_SYSTEM_OWNER must be uppercase alphanumeric/underscore, 1-30 chars",
+            },
+            "SOURCE_SYSTEM_ID": {
+                "required": False,
+                "min_length": 1,
+                "max_length": 30,
+                "regex": r"^[A-Z0-9_-]+$",
+                "error_msg": "SOURCE_SYSTEM_ID must be alphanumeric with underscores/dashes, 1-30 chars",
+            },
+            "PERSON_NUMBER": {
+                "required": True,
+                "min_length": 1,
+                "max_length": 30,
+                "regex": r"^[A-Z0-9_-]+$",
+                "error_msg": "PERSON_NUMBER must be alphanumeric with underscores/dashes, 1-30 chars",
+            },
+            "DATE_START": {
+                "required": True,
+                "data_type": "date",
+                "error_msg": "DATE_START must be a valid date",
+            },
+            "WORKER_TYPE": {
+                "required": True,
+                "min_length": 1,
+                "max_length": 30,
+                "regex": r"^[A-Z0-9_]+$",
+                "error_msg": "WORKER_TYPE must be uppercase alphanumeric/underscore, 1-30 chars (e.g. E for Employee, C for Contingent Worker)",
+            },
+            "LEGAL_EMPLOYER_NAME": {
+                "required": True,
+                "min_length": 1,
+                "max_length": 240,
+                "error_msg": "LEGAL_EMPLOYER_NAME must be 1-240 chars",
+            },
+            "PRIMARY_FLAG": {
+                "required": True,
+                "regex": r"^[YN]$",
+                "error_msg": "PRIMARY_FLAG must be Y (Yes) or N (No)",
+            },
+            "ACTION_CODE": {
+                "required": False,
+                "min_length": 1,
+                "max_length": 30,
+                "regex": r"^[A-Z0-9_]+$",
+                "error_msg": "ACTION_CODE must be uppercase alphanumeric/underscore, 1-30 chars",
+            },
+            "ACTUAL_TERMINATION_DATE": {
+                "required": False,
+                "data_type": "date",
+                "error_msg": "ACTUAL_TERMINATION_DATE must be a valid date",
+            },
+            "CANCEL_WORK_RELATIONSHIP_FLAG": {
+                "required": False,
+                "regex": r"^[YN]$",
+                "error_msg": "CANCEL_WORK_RELATIONSHIP_FLAG must be Y (Yes) or N (No)",
+            },
+            "COMMENTS": {
+                "required": False,
+                "min_length": 1,
+                "max_length": 240,
+                "error_msg": "COMMENTS must be 1-240 chars",
+            },
+            "CORRECT_TERMINATION_FLAG": {
+                "required": False,
+                "regex": r"^[YN]$",
+                "error_msg": "CORRECT_TERMINATION_FLAG must be Y (Yes) or N (No)",
+            },
+            "DATE_FOR_PRIMARY_FLAG_CHANGE": {
+                "required": False,
+                "data_type": "date",
+                "error_msg": "DATE_FOR_PRIMARY_FLAG_CHANGE must be a valid date",
+            },
+            "DATE_OF_DEATH": {
+                "required": False,
+                "data_type": "date",
+                "error_msg": "DATE_OF_DEATH must be a valid date",
+            },
+            "ENTERPRISE_SENIORITY_DATE": {
+                "required": False,
+                "data_type": "date",
+                "error_msg": "ENTERPRISE_SENIORITY_DATE must be a valid date",
+            },
+            "GLOBAL_TRANSFER_FLAG": {
+                "required": False,
+                "regex": r"^[YN]$",
+                "error_msg": "GLOBAL_TRANSFER_FLAG must be Y (Yes) or N (No)",
+            },
+            "HIDE_UNTIL_DATE": {
+                "required": False,
+                "data_type": "date",
+                "error_msg": "HIDE_UNTIL_DATE must be a valid date",
+            },
+            "LAST_WORKING_DATE": {
+                "required": False,
+                "data_type": "date",
+                "error_msg": "LAST_WORKING_DATE must be a valid date",
+            },
+            "LEGAL_EMPLOYER_SENIORITY_DATE": {
+                "required": False,
+                "data_type": "date",
+                "error_msg": "LEGAL_EMPLOYER_SENIORITY_DATE must be a valid date",
+            },
+            "NEW_START_DATE": {
+                "required": False,
+                "data_type": "date",
+                "error_msg": "NEW_START_DATE must be a valid date",
+            },
+            "NOTIFIED_TERMINATION_DATE": {
+                "required": False,
+                "data_type": "date",
+                "error_msg": "NOTIFIED_TERMINATION_DATE must be a valid date",
+            },
+            "PROJECTED_TERMINATION_DATE": {
+                "required": False,
+                "data_type": "date",
+                "error_msg": "PROJECTED_TERMINATION_DATE must be a valid date",
+            },
+            "READY_TO_CONVERT": {
+                "required": False,
+                "regex": r"^[YN]$",
+                "error_msg": "READY_TO_CONVERT must be Y (Yes) or N (No)",
+            },
+            "REASON_CODE": {
+                "required": False,
+                "min_length": 1,
+                "max_length": 30,
+                "regex": r"^[A-Z0-9_]+$",
+                "error_msg": "REASON_CODE must be uppercase alphanumeric/underscore, 1-30 chars",
+            },
+            "REHIRE_AUTHORIZER_PERSON_ID": {
+                "required": False,
+                "min_length": 1,
+                "max_length": 30,
+                "error_msg": "REHIRE_AUTHORIZER_PERSON_ID must be 1-30 chars",
+            },
+            "REHIRE_AUTHORIZOR": {
+                "required": False,
+                "min_length": 1,
+                "max_length": 240,
+                "error_msg": "REHIRE_AUTHORIZOR must be 1-240 chars",
+            },
+            "REHIRE_REASON": {
+                "required": False,
+                "min_length": 1,
+                "max_length": 240,
+                "error_msg": "REHIRE_REASON must be 1-240 chars",
+            },
+            "REVERSE_TERMINATION_FLAG": {
+                "required": False,
+                "regex": r"^[YN]$",
+                "error_msg": "REVERSE_TERMINATION_FLAG must be Y (Yes) or N (No)",
+            },
+            "REVOKE_USER_ACCESS": {
+                "required": False,
+                "regex": r"^[YN]$",
+                "error_msg": "REVOKE_USER_ACCESS must be Y (Yes) or N (No)",
+            },
+            "TERMINATE_WORK_RELATIONSHIP_FLAG": {
+                "required": False,
+                "regex": r"^[YN]$",
+                "error_msg": "TERMINATE_WORK_RELATIONSHIP_FLAG must be Y (Yes) or N (No)",
+            },
+            "WORKER_COMMENTS": {
+                "required": False,
+                "min_length": 1,
+                "max_length": 240,
+                "error_msg": "WORKER_COMMENTS must be 1-240 chars",
+            },
+            "WORKER_NUMBER": {
+                "required": False,
+                "min_length": 1,
+                "max_length": 30,
+                "regex": r"^[A-Z0-9_-]+$",
+                "error_msg": "WORKER_NUMBER must be alphanumeric with underscores/dashes, 1-30 chars",
+            },
+            "GUID": {
+                "required": False,
+                "min_length": 1,
+                "max_length": 64,
+                "regex": r"^[A-Za-z0-9_\-]+$",
+                "error_msg": "GUID must be alphanumeric with underscores/dashes, 1-64 chars",
+            },
+        },
+        default_source_system_owner="HCMQA-001",
+        default_source_system_id="WORK_REL_{row_index}",
+        output_filename_template="WorkRelationship.dat",
+        output_header="METADATA|WorkRelationship|SourceSystemOwner|SourceSystemId|PersonNumber|DateStart|WorkerType|LegalEmployerName|PrimaryFlag|ActionCode|ActualTerminationDate|CancelWorkRelationshipFlag|Comments|CorrectTerminationFlag|DateForPrimaryFlagChange|DateOfDeath|EnterpriseSeniorityDate|GlobalTransferFlag|HideUntilDate|LastWorkingDate|LegalEmployerSeniorityDate|NewStartDate|NotifiedTerminationDate|ProjectedTerminationDate|ReadyToConvert|ReasonCode|RehireAuthorizerPersonId|RehireAuthorizor|RehireReason|ReverseTerminationFlag|RevokeUserAccess|TerminateWorkRelationshipFlag|WorkerComments|WorkerNumber|GUID",
+        output_template=(
+            "MERGE|WorkRelationship|{SOURCE_SYSTEM_OWNER}|{SOURCE_SYSTEM_ID}|"
+            "{PERSON_NUMBER}|{DATE_START}|{WORKER_TYPE}|{LEGAL_EMPLOYER_NAME}|{PRIMARY_FLAG}|"
+            "{ACTION_CODE}|{ACTUAL_TERMINATION_DATE}|{CANCEL_WORK_RELATIONSHIP_FLAG}|"
+            "{COMMENTS}|{CORRECT_TERMINATION_FLAG}|{DATE_FOR_PRIMARY_FLAG_CHANGE}|"
+            "{DATE_OF_DEATH}|{ENTERPRISE_SENIORITY_DATE}|{GLOBAL_TRANSFER_FLAG}|"
+            "{HIDE_UNTIL_DATE}|{LAST_WORKING_DATE}|{LEGAL_EMPLOYER_SENIORITY_DATE}|"
+            "{NEW_START_DATE}|{NOTIFIED_TERMINATION_DATE}|{PROJECTED_TERMINATION_DATE}|"
+            "{READY_TO_CONVERT}|{REASON_CODE}|{REHIRE_AUTHORIZER_PERSON_ID}|"
+            "{REHIRE_AUTHORIZOR}|{REHIRE_REASON}|{REVERSE_TERMINATION_FLAG}|"
+            "{REVOKE_USER_ACCESS}|{TERMINATE_WORK_RELATIONSHIP_FLAG}|"
+            "{WORKER_COMMENTS}|{WORKER_NUMBER}|{GUID}"
+        ),
+        description="Work Relationship object migration file for Oracle Fusion HCM Workforce Structures.",
+    ),
+
+    "Assignment": ObjectDefinition( # type: ignore
+        name="Assignment",
+        aliases=["assignment", "assignments", "work_assignment", "employee_assignment"],
+        required_columns=[
+            "SOURCE_SYSTEM_OWNER",
+            "SOURCE_SYSTEM_ID",
+            "ASSIGNMENT_NUMBER",
+            "WORK_TERMS_NUMBER",
+            "EFFECTIVE_LATEST_CHANGE",
+            "EFFECTIVE_SEQUENCE",
+            "EFFECTIVE_START_DATE",
+            "ASSIGNMENT_STATUS_TYPE_CODE",
+            "ASSIGNMENT_TYPE",
+            "BUSINESS_UNIT_SHORT_CODE",
+            "PRIMARY_FLAG",
+            "PERSON_NUMBER",
+        ],
+        optional_columns=[
+            "ACTION_CODE",
+            "EFFECTIVE_END_DATE",
+            "ASSIGNMENT_NAME",
+            "BARGAINING_UNIT_CODE",
+            "BILLING_TITLE",
+            "COLLECTIVE_AGREEMENT_ID_CODE",
+            "CONTRACT_ID",
+            "DATE_PROBATION_END",
+            "REPORTING_ESTABLISHMENT",
+            "LEGAL_EMPLOYER_NAME",
+            "GRADE_CODE",
+            "GRADE_LADDER_PGM_NAME",
+            "HOURLY_SALARIED_CODE",
+            "INTERNAL_BUILDING",
+            "INTERNAL_FLOOR",
+            "INTERNAL_LOCATION",
+            "INTERNAL_MAILSTOP",
+            "INTERNAL_OFFICE_NUMBER",
+            "JOB_CODE",
+            "LABOUR_UNION_MEMBER_FLAG",
+            "LOCATION_CODE",
+            "MANAGER_FLAG",
+            "NORMAL_HOURS",
+            "NOTICE_PERIOD",
+            "DEPARTMENT_NAME",
+            "DATE_START",
+            "PERSON_TYPE_CODE",
+            "SYSTEM_PERSON_TYPE",
+            "POSITION_CODE",
+            "POSITION_OVERRIDE_FLAG",
+            "PRIMARY_ASSIGNMENT_FLAG",
+            "PROBATION_PERIOD",
+            "PROJECT_TITLE",
+            "PROJECTED_END_DATE",
+            "PROJECTED_START_DATE",
+            "PROPOSED_USER_PERSON_TYPE",
+            "PROPOSED_WORKER_TYPE",
+            "REASON_CODE",
+            "RETIREMENT_AGE",
+            "RETIREMENT_DATE",
+            "SPECIAL_CEILING_STEP",
+            "TAX_ADDRESS_ID",
+            "END_TIME",
+            "START_TIME",
+            "WORK_AT_HOME_FLAG",
+            "FREEZE_START_DATE",
+            "FREEZE_UNTIL_DATE",
+            "GUID",
+            "PEOPLE_GROUP",
+            "GSP_ELIGIBILITY_FLAG",
+            "DEFAULT_EXPENSE_ACCOUNT",
+            "UNION_ID",
+            "UNION_NAME",
+            "OVERTIME_PERIOD_NAME",
+            "SOURCE_ASSIGNMENT_NUMBER",
+            "TAX_REPORTING_UNIT",
+            "CONTRACT_NUMBER",
+            "TERMINATION_DATE",
+            "NOTIFICATION_DATE",
+            "LAST_WORKING_DATE",
+            "REHIRE_AUTHORIZER_PERSON_NUMBER",
+            "TERMINATE_ASSIGNMENT_FLAG",
+            "CORRECT_ASSIGNMENT_TERMINATION_FLAG",
+            "REVERSE_ASSIGNMENT_TERMINATION_FLAG",
+            "REQUISITION_NUMBER",
+            "CANDIDATE_NUMBER",
+            "ADJUSTED_FTE",
+            "ANNUAL_WORKING_DURATION",
+            "ANNUAL_WORKING_DURATION_UNITS",
+            "ANNUAL_WORKING_RATIO",
+            "STANDARD_HOURS",
+            "STD_ANNUAL_WORKING_DURATION",
+            "NOTES",
+        ],
+        unique_columns=[
+            "ASSIGNMENT_NUMBER",
+            "PERSON_NUMBER",
+            "EFFECTIVE_START_DATE",
+            "SOURCE_SYSTEM_ID",
+        ],
+        date_columns=[
+            "EFFECTIVE_START_DATE",
+            "EFFECTIVE_END_DATE",
+            "DATE_PROBATION_END",
+            "DATE_START",
+            "PROJECTED_END_DATE",
+            "PROJECTED_START_DATE",
+            "RETIREMENT_DATE",
+            "FREEZE_START_DATE",
+            "FREEZE_UNTIL_DATE",
+            "TERMINATION_DATE",
+            "NOTIFICATION_DATE",
+            "LAST_WORKING_DATE",
+        ],
+        column_aliases={
+            "SOURCE_SYSTEM_OWNER": ["SourceSystemOwner", "source_system_owner"],
+            "SOURCE_SYSTEM_ID": ["SourceSystemId", "source_system_id"],
+            "ASSIGNMENT_NUMBER": [
+                "AssignmentNumber", "assignment_number", "Assignment_Number",
+                "AssignmentNum", "assignment_num",
+            ],
+            "WORK_TERMS_NUMBER": [
+                "WorkTermsNumber", "work_terms_number", "Work_Terms_Number",
+                "WorkTermsNum", "work_terms_num",
+            ],
+            "EFFECTIVE_LATEST_CHANGE": [
+                "EffectiveLatestChange", "effective_latest_change",
+                "Effective_Latest_Change", "LatestChange", "latest_change",
+            ],
+            "EFFECTIVE_SEQUENCE": [
+                "EffectiveSequence", "effective_sequence",
+                "Effective_Sequence", "EffSeq", "eff_seq",
+            ],
+            "EFFECTIVE_START_DATE": ["EffectiveStartDate", "effective_start_date", "StartDate", "start_date"],
+            "EFFECTIVE_END_DATE": ["EffectiveEndDate", "effective_end_date", "EndDate", "end_date"],
+            "ASSIGNMENT_STATUS_TYPE_CODE": [
+                "AssignmentStatusTypeCode", "assignment_status_type_code",
+                "Assignment_Status_Type_Code", "AssignmentStatusCode", "assignment_status_code",
+            ],
+            "ASSIGNMENT_TYPE": [
+                "AssignmentType", "assignment_type", "Assignment_Type",
+                "AssignType", "assign_type",
+            ],
+            "BUSINESS_UNIT_SHORT_CODE": [
+                "BusinessUnitShortCode", "business_unit_short_code",
+                "Business_Unit_Short_Code", "BUShortCode", "bu_short_code",
+            ],
+            "PRIMARY_FLAG": ["PrimaryFlag", "primary_flag", "Primary_Flag", "IsPrimary", "is_primary"],
+            "PERSON_NUMBER": ["PersonNumber", "person_number", "Person_Number"],
+            "ACTION_CODE": ["ActionCode", "action_code", "Action_Code"],
+            "ASSIGNMENT_NAME": [
+                "AssignmentName", "assignment_name", "Assignment_Name",
+                "AssignName", "assign_name",
+            ],
+            "BARGAINING_UNIT_CODE": [
+                "BargainingUnitCode", "bargaining_unit_code",
+                "Bargaining_Unit_Code", "BargUnitCode", "barg_unit_code",
+            ],
+            "BILLING_TITLE": ["BillingTitle", "billing_title", "Billing_Title"],
+            "COLLECTIVE_AGREEMENT_ID_CODE": [
+                "CollectiveAgreementIdCode", "collective_agreement_id_code",
+                "Collective_Agreement_Id_Code", "CollAgmtIdCode", "coll_agmt_id_code",
+            ],
+            "CONTRACT_ID": ["ContractId", "contract_id", "Contract_Id", "ContractID", "contract_ID"],
+            "DATE_PROBATION_END": [
+                "DateProbationEnd", "date_probation_end", "Date_Probation_End",
+                "ProbationEndDate", "probation_end_date",
+            ],
+            "REPORTING_ESTABLISHMENT": [
+                "ReportingEstablishment", "reporting_establishment",
+                "Reporting_Establishment", "ReportEstablishment", "report_establishment",
+            ],
+            "LEGAL_EMPLOYER_NAME": [
+                "LegalEmployerName", "legal_employer_name", "Legal_Employer_Name",
+                "LegalEmployer", "legal_employer",
+            ],
+            "GRADE_CODE": ["GradeCode", "grade_code", "Grade_Code", "Grade", "grade"],
+            "GRADE_LADDER_PGM_NAME": [
+                "GradeLadderPgmName", "grade_ladder_pgm_name",
+                "Grade_Ladder_Pgm_Name", "GradeLadderName", "grade_ladder_name",
+            ],
+            "HOURLY_SALARIED_CODE": [
+                "HourlySalariedCode", "hourly_salaried_code",
+                "Hourly_Salaried_Code", "HrlySalCode", "hrly_sal_code",
+            ],
+            "INTERNAL_BUILDING": [
+                "InternalBuilding", "internal_building",
+                "Internal_Building", "IntBuilding", "int_building",
+            ],
+            "INTERNAL_FLOOR": [
+                "InternalFloor", "internal_floor", "Internal_Floor",
+                "IntFloor", "int_floor",
+            ],
+            "INTERNAL_LOCATION": [
+                "InternalLocation", "internal_location", "Internal_Location",
+                "IntLocation", "int_location",
+            ],
+            "INTERNAL_MAILSTOP": [
+                "InternalMailstop", "internal_mailstop", "Internal_Mailstop",
+                "InternalMailStop", "internal_mail_stop", "MailStop", "mail_stop",
+            ],
+            "INTERNAL_OFFICE_NUMBER": [
+                "InternalOfficeNumber", "internal_office_number",
+                "Internal_Office_Number", "OfficeNumber", "office_number",
+            ],
+            "JOB_CODE": ["JobCode", "job_code", "Job_Code", "Job", "job"],
+            "LABOUR_UNION_MEMBER_FLAG": [
+                "LabourUnionMemberFlag", "labour_union_member_flag",
+                "Labour_Union_Member_Flag", "LaborUnionMemberFlag", "labor_union_member_flag",
+                "UnionMemberFlag", "union_member_flag",
+            ],
+            "LOCATION_CODE": ["LocationCode", "location_code", "Location_Code", "Location", "location"],
+            "MANAGER_FLAG": ["ManagerFlag", "manager_flag", "Manager_Flag", "IsManager", "is_manager"],
+            "NORMAL_HOURS": ["NormalHours", "normal_hours", "Normal_Hours", "StdHours", "std_hours"],
+            "NOTICE_PERIOD": ["NoticePeriod", "notice_period", "Notice_Period"],
+            "DEPARTMENT_NAME": [
+                "DepartmentName", "department_name", "Department_Name",
+                "DeptName", "dept_name",
+            ],
+            "DATE_START": ["DateStart", "date_start", "Date_Start", "HireDate", "hire_date"],
+            "PERSON_TYPE_CODE": [
+                "PersonTypeCode", "person_type_code", "Person_Type_Code",
+                "PersonType", "person_type",
+            ],
+            "SYSTEM_PERSON_TYPE": [
+                "SystemPersonType", "system_person_type", "System_Person_Type",
+                "SysPersonType", "sys_person_type",
+            ],
+            "POSITION_CODE": ["PositionCode", "position_code", "Position_Code", "Position", "position"],
+            "POSITION_OVERRIDE_FLAG": [
+                "PositionOverrideFlag", "position_override_flag",
+                "Position_Override_Flag", "PosOverrideFlag", "pos_override_flag",
+            ],
+            "PRIMARY_ASSIGNMENT_FLAG": [
+                "PrimaryAssignmentFlag", "primary_assignment_flag",
+                "Primary_Assignment_Flag", "PrimaryAssignFlag", "primary_assign_flag",
+            ],
+            "PROBATION_PERIOD": ["ProbationPeriod", "probation_period", "Probation_Period"],
+            "PROJECT_TITLE": ["ProjectTitle", "project_title", "Project_Title", "ProjTitle", "proj_title"],
+            "PROJECTED_END_DATE": [
+                "ProjectedEndDate", "projected_end_date", "Projected_End_Date",
+                "ProjEndDate", "proj_end_date",
+            ],
+            "PROJECTED_START_DATE": [
+                "ProjectedStartDate", "projected_start_date", "Projected_Start_Date",
+                "ProjStartDate", "proj_start_date",
+            ],
+            "PROPOSED_USER_PERSON_TYPE": [
+                "ProposedUserPersonType", "proposed_user_person_type",
+                "Proposed_User_Person_Type", "PropUserPersonType", "prop_user_person_type",
+            ],
+            "PROPOSED_WORKER_TYPE": [
+                "ProposedWorkerType", "proposed_worker_type",
+                "Proposed_Worker_Type", "PropWorkerType", "prop_worker_type",
+            ],
+            "REASON_CODE": ["ReasonCode", "reason_code", "Reason_Code", "ActionReasonCode", "action_reason_code"],
+            "RETIREMENT_AGE": ["RetirementAge", "retirement_age", "Retirement_Age", "RetireAge", "retire_age"],
+            "RETIREMENT_DATE": ["RetirementDate", "retirement_date", "Retirement_Date", "RetireDate", "retire_date"],
+            "SPECIAL_CEILING_STEP": [
+                "SpecialCeilingStep", "special_ceiling_step",
+                "Special_Ceiling_Step", "CeilingStep", "ceiling_step",
+            ],
+            "TAX_ADDRESS_ID": [
+                "TaxAddressId", "tax_address_id", "Tax_Address_Id",
+                "TaxAddrId", "tax_addr_id",
+            ],
+            "END_TIME": ["EndTime", "end_time", "End_Time"],
+            "START_TIME": ["StartTime", "start_time", "Start_Time"],
+            "WORK_AT_HOME_FLAG": [
+                "WorkAtHomeFlag", "work_at_home_flag", "Work_At_Home_Flag",
+                "WFHFlag", "wfh_flag", "RemoteFlag", "remote_flag",
+            ],
+            "FREEZE_START_DATE": [
+                "FreezeStartDate", "freeze_start_date", "Freeze_Start_Date",
+                "FreezeFrom", "freeze_from",
+            ],
+            "FREEZE_UNTIL_DATE": [
+                "FreezeUntilDate", "freeze_until_date", "Freeze_Until_Date",
+                "FreezeTo", "freeze_to",
+            ],
+            "GUID": ["GUID", "guid", "GlobalUniqueIdentifier", "global_unique_identifier"],
+            "PEOPLE_GROUP": ["PeopleGroup", "people_group", "People_Group", "PplGroup", "ppl_group"],
+            "GSP_ELIGIBILITY_FLAG": [
+                "GspEligibilityFlag", "gsp_eligibility_flag", "GSP_Eligibility_Flag",
+                "GspFlag", "gsp_flag",
+            ],
+            "DEFAULT_EXPENSE_ACCOUNT": [
+                "DefaultExpenseAccount", "default_expense_account",
+                "Default_Expense_Account", "ExpenseAccount", "expense_account",
+            ],
+            "UNION_ID": ["UnionId", "union_id", "Union_Id", "UnionID", "union_ID"],
+            "UNION_NAME": ["UnionName", "union_name", "Union_Name", "Union", "union"],
+            "OVERTIME_PERIOD_NAME": [
+                "OvertimePeriodName", "overtime_period_name",
+                "Overtime_Period_Name", "OTPeriodName", "ot_period_name",
+            ],
+            "SOURCE_ASSIGNMENT_NUMBER": [
+                "SourceAssignmentNumber", "source_assignment_number",
+                "Source_Assignment_Number", "SrcAssignmentNum", "src_assignment_num",
+            ],
+            "TAX_REPORTING_UNIT": [
+                "TaxReportingUnit", "tax_reporting_unit", "Tax_Reporting_Unit",
+                "TRU", "tru",
+            ],
+            "CONTRACT_NUMBER": [
+                "ContractNumber", "contract_number", "Contract_Number",
+                "ContractNum", "contract_num",
+            ],
+            "TERMINATION_DATE": [
+                "TerminationDate", "termination_date", "Termination_Date",
+                "TermDate", "term_date",
+            ],
+            "NOTIFICATION_DATE": [
+                "NotificationDate", "notification_date", "Notification_Date",
+                "NoticeDate", "notice_date",
+            ],
+            "LAST_WORKING_DATE": [
+                "LastWorkingDate", "last_working_date", "Last_Working_Date",
+                "LastDayWorked", "last_day_worked",
+            ],
+            "REHIRE_AUTHORIZER_PERSON_NUMBER": [
+                "RehireAuthorizerPersonNumber", "rehire_authorizer_person_number",
+                "Rehire_Authorizer_Person_Number", "RehireAuthorizerNum", "rehire_authorizer_num",
+            ],
+            "TERMINATE_ASSIGNMENT_FLAG": [
+                "TerminateAssignmentFlag", "terminate_assignment_flag",
+                "Terminate_Assignment_Flag", "TermAssignFlag", "term_assign_flag",
+            ],
+            "CORRECT_ASSIGNMENT_TERMINATION_FLAG": [
+                "CorrectAssignmentTerminationFlag", "correct_assignment_termination_flag",
+                "Correct_Assignment_Termination_Flag", "CorrectTermFlag", "correct_term_flag",
+            ],
+            "REVERSE_ASSIGNMENT_TERMINATION_FLAG": [
+                "ReverseAssignmentTerminationFlag", "reverse_assignment_termination_flag",
+                "Reverse_Assignment_Termination_Flag", "ReverseTermFlag", "reverse_term_flag",
+            ],
+            "REQUISITION_NUMBER": [
+                "RequisitionNumber", "requisition_number", "Requisition_Number",
+                "ReqNumber", "req_number", "ReqNum", "req_num",
+            ],
+            "CANDIDATE_NUMBER": [
+                "CandidateNumber", "candidate_number", "Candidate_Number",
+                "CandidateNum", "candidate_num",
+            ],
+            "ADJUSTED_FTE": ["AdjustedFte", "adjusted_fte", "Adjusted_Fte", "AdjFTE", "adj_fte"],
+            "ANNUAL_WORKING_DURATION": [
+                "AnnualWorkingDuration", "annual_working_duration",
+                "Annual_Working_Duration", "AnnWorkDuration", "ann_work_duration",
+            ],
+            "ANNUAL_WORKING_DURATION_UNITS": [
+                "AnnualWorkingDurationUnits", "annual_working_duration_units",
+                "Annual_Working_Duration_Units", "AnnWorkDurationUnits", "ann_work_duration_units",
+            ],
+            "ANNUAL_WORKING_RATIO": [
+                "AnnualWorkingRatio", "annual_working_ratio",
+                "Annual_Working_Ratio", "AnnWorkRatio", "ann_work_ratio",
+            ],
+            "STANDARD_HOURS": [
+                "StandardHours", "standard_hours", "Standard_Hours",
+                "StdHours", "std_hours",
+            ],
+            "STD_ANNUAL_WORKING_DURATION": [
+                "StdAnnualWorkingDuration", "std_annual_working_duration",
+                "Std_Annual_Working_Duration", "StdAnnWorkDuration", "std_ann_work_duration",
+            ],
+            "NOTES": ["Notes", "notes", "Note", "note", "Comments", "comments"],
+        },
+        validation_rules={
+            "SOURCE_SYSTEM_OWNER": {
+                "required": False,
+                "min_length": 1,
+                "max_length": 30,
+                "regex": r"^[A-Z0-9_]+$",
+                "error_msg": "SOURCE_SYSTEM_OWNER must be uppercase alphanumeric/underscore, 1-30 chars",
+            },
+            "SOURCE_SYSTEM_ID": {
+                "required": False,
+                "min_length": 1,
+                "max_length": 30,
+                "regex": r"^[A-Z0-9_-]+$",
+                "error_msg": "SOURCE_SYSTEM_ID must be alphanumeric with underscores/dashes, 1-30 chars",
+            },
+            "ASSIGNMENT_NUMBER": {
+                "required": True,
+                "min_length": 1,
+                "max_length": 30,
+                "regex": r"^[A-Z0-9_-]+$",
+                "error_msg": "ASSIGNMENT_NUMBER must be alphanumeric with underscores/dashes, 1-30 chars",
+            },
+            "WORK_TERMS_NUMBER": {
+                "required": True,
+                "min_length": 1,
+                "max_length": 30,
+                "regex": r"^[A-Z0-9_-]+$",
+                "error_msg": "WORK_TERMS_NUMBER must be alphanumeric with underscores/dashes, 1-30 chars",
+            },
+            "EFFECTIVE_LATEST_CHANGE": {
+                "required": True,
+                "regex": r"^[YN]$",
+                "error_msg": "EFFECTIVE_LATEST_CHANGE must be Y (Yes) or N (No)",
+            },
+            "EFFECTIVE_SEQUENCE": {
+                "required": True,
+                "min_length": 1,
+                "max_length": 10,
+                "regex": r"^[0-9]+$",
+                "error_msg": "EFFECTIVE_SEQUENCE must be a numeric value, 1-10 chars",
+            },
+            "EFFECTIVE_START_DATE": {
+                "required": True,
+                "data_type": "date",
+                "error_msg": "EFFECTIVE_START_DATE must be a valid date",
+            },
+            "ASSIGNMENT_STATUS_TYPE_CODE": {
+                "required": True,
+                "min_length": 1,
+                "max_length": 80,
+                "error_msg": "ASSIGNMENT_STATUS_TYPE_CODE must be 1-80 chars",
+            },
+            "ASSIGNMENT_TYPE": {
+                "required": True,
+                "min_length": 1,
+                "max_length": 30,
+                "regex": r"^[A-Z0-9_]+$",
+                "error_msg": "ASSIGNMENT_TYPE must be uppercase alphanumeric/underscore, 1-30 chars (e.g. E for Employee, C for Contingent Worker)",
+            },
+            "BUSINESS_UNIT_SHORT_CODE": {
+                "required": True,
+                "min_length": 1,
+                "max_length": 30,
+                "regex": r"^[A-Z0-9_-]+$",
+                "error_msg": "BUSINESS_UNIT_SHORT_CODE must be alphanumeric with underscores/dashes, 1-30 chars",
+            },
+            "PRIMARY_FLAG": {
+                "required": True,
+                "regex": r"^[YN]$",
+                "error_msg": "PRIMARY_FLAG must be Y (Yes) or N (No)",
+            },
+            "PERSON_NUMBER": {
+                "required": True,
+                "min_length": 1,
+                "max_length": 30,
+                "regex": r"^[A-Z0-9_-]+$",
+                "error_msg": "PERSON_NUMBER must be alphanumeric with underscores/dashes, 1-30 chars",
+            },
+            "ACTION_CODE": {
+                "required": False,
+                "min_length": 1,
+                "max_length": 30,
+                "regex": r"^[A-Z0-9_]+$",
+                "error_msg": "ACTION_CODE must be uppercase alphanumeric/underscore, 1-30 chars",
+            },
+            "EFFECTIVE_END_DATE": {
+                "required": False,
+                "data_type": "date",
+                "error_msg": "EFFECTIVE_END_DATE must be a valid date",
+            },
+            "ASSIGNMENT_NAME": {
+                "required": False,
+                "min_length": 1,
+                "max_length": 80,
+                "error_msg": "ASSIGNMENT_NAME must be 1-80 chars",
+            },
+            "BARGAINING_UNIT_CODE": {
+                "required": False,
+                "min_length": 1,
+                "max_length": 30,
+                "regex": r"^[A-Z0-9_]+$",
+                "error_msg": "BARGAINING_UNIT_CODE must be uppercase alphanumeric/underscore, 1-30 chars",
+            },
+            "BILLING_TITLE": {
+                "required": False,
+                "min_length": 1,
+                "max_length": 240,
+                "error_msg": "BILLING_TITLE must be 1-240 chars",
+            },
+            "COLLECTIVE_AGREEMENT_ID_CODE": {
+                "required": False,
+                "min_length": 1,
+                "max_length": 80,
+                "error_msg": "COLLECTIVE_AGREEMENT_ID_CODE must be 1-80 chars",
+            },
+            "CONTRACT_ID": {
+                "required": False,
+                "min_length": 1,
+                "max_length": 30,
+                "regex": r"^[0-9]+$",
+                "error_msg": "CONTRACT_ID must be a numeric value, 1-30 chars",
+            },
+            "DATE_PROBATION_END": {
+                "required": False,
+                "data_type": "date",
+                "error_msg": "DATE_PROBATION_END must be a valid date",
+            },
+            "REPORTING_ESTABLISHMENT": {
+                "required": False,
+                "min_length": 1,
+                "max_length": 240,
+                "error_msg": "REPORTING_ESTABLISHMENT must be 1-240 chars",
+            },
+            "LEGAL_EMPLOYER_NAME": {
+                "required": False,
+                "min_length": 1,
+                "max_length": 240,
+                "error_msg": "LEGAL_EMPLOYER_NAME must be 1-240 chars",
+            },
+            "GRADE_CODE": {
+                "required": False,
+                "min_length": 1,
+                "max_length": 30,
+                "regex": r"^[A-Z0-9_-]+$",
+                "error_msg": "GRADE_CODE must be alphanumeric with underscores/dashes, 1-30 chars",
+            },
+            "GRADE_LADDER_PGM_NAME": {
+                "required": False,
+                "min_length": 1,
+                "max_length": 240,
+                "error_msg": "GRADE_LADDER_PGM_NAME must be 1-240 chars",
+            },
+            "HOURLY_SALARIED_CODE": {
+                "required": False,
+                "min_length": 1,
+                "max_length": 30,
+                "regex": r"^[A-Z0-9_]+$",
+                "error_msg": "HOURLY_SALARIED_CODE must be uppercase alphanumeric/underscore, 1-30 chars (e.g. HOURLY, SALARIED)",
+            },
+            "INTERNAL_BUILDING": {
+                "required": False,
+                "min_length": 1,
+                "max_length": 45,
+                "error_msg": "INTERNAL_BUILDING must be 1-45 chars",
+            },
+            "INTERNAL_FLOOR": {
+                "required": False,
+                "min_length": 1,
+                "max_length": 45,
+                "error_msg": "INTERNAL_FLOOR must be 1-45 chars",
+            },
+            "INTERNAL_LOCATION": {
+                "required": False,
+                "min_length": 1,
+                "max_length": 45,
+                "error_msg": "INTERNAL_LOCATION must be 1-45 chars",
+            },
+            "INTERNAL_MAILSTOP": {
+                "required": False,
+                "min_length": 1,
+                "max_length": 45,
+                "error_msg": "INTERNAL_MAILSTOP must be 1-45 chars",
+            },
+            "INTERNAL_OFFICE_NUMBER": {
+                "required": False,
+                "min_length": 1,
+                "max_length": 45,
+                "error_msg": "INTERNAL_OFFICE_NUMBER must be 1-45 chars",
+            },
+            "JOB_CODE": {
+                "required": False,
+                "min_length": 1,
+                "max_length": 30,
+                "regex": r"^[A-Z0-9_-]+$",
+                "error_msg": "JOB_CODE must be alphanumeric with underscores/dashes, 1-30 chars",
+            },
+            "LABOUR_UNION_MEMBER_FLAG": {
+                "required": False,
+                "regex": r"^[YN]$",
+                "error_msg": "LABOUR_UNION_MEMBER_FLAG must be Y (Yes) or N (No)",
+            },
+            "LOCATION_CODE": {
+                "required": False,
+                "min_length": 1,
+                "max_length": 60,
+                "error_msg": "LOCATION_CODE must be 1-60 chars",
+            },
+            "MANAGER_FLAG": {
+                "required": False,
+                "regex": r"^[YN]$",
+                "error_msg": "MANAGER_FLAG must be Y (Yes) or N (No)",
+            },
+            "NORMAL_HOURS": {
+                "required": False,
+                "min_length": 1,
+                "max_length": 10,
+                "regex": r"^[0-9]+(\.[0-9]+)?$",
+                "error_msg": "NORMAL_HOURS must be a valid numeric value, 1-10 chars",
+            },
+            "NOTICE_PERIOD": {
+                "required": False,
+                "min_length": 1,
+                "max_length": 10,
+                "regex": r"^[0-9]+$",
+                "error_msg": "NOTICE_PERIOD must be a numeric value, 1-10 chars",
+            },
+            "DEPARTMENT_NAME": {
+                "required": False,
+                "min_length": 1,
+                "max_length": 240,
+                "error_msg": "DEPARTMENT_NAME must be 1-240 chars",
+            },
+            "DATE_START": {
+                "required": False,
+                "data_type": "date",
+                "error_msg": "DATE_START must be a valid date",
+            },
+            "PERSON_TYPE_CODE": {
+                "required": False,
+                "min_length": 1,
+                "max_length": 30,
+                "regex": r"^[A-Z0-9_]+$",
+                "error_msg": "PERSON_TYPE_CODE must be uppercase alphanumeric/underscore, 1-30 chars",
+            },
+            "SYSTEM_PERSON_TYPE": {
+                "required": False,
+                "min_length": 1,
+                "max_length": 30,
+                "regex": r"^[A-Z0-9_]+$",
+                "error_msg": "SYSTEM_PERSON_TYPE must be uppercase alphanumeric/underscore, 1-30 chars",
+            },
+            "POSITION_CODE": {
+                "required": False,
+                "min_length": 1,
+                "max_length": 30,
+                "regex": r"^[A-Z0-9_-]+$",
+                "error_msg": "POSITION_CODE must be alphanumeric with underscores/dashes, 1-30 chars",
+            },
+            "POSITION_OVERRIDE_FLAG": {
+                "required": False,
+                "regex": r"^[YN]$",
+                "error_msg": "POSITION_OVERRIDE_FLAG must be Y (Yes) or N (No)",
+            },
+            "PRIMARY_ASSIGNMENT_FLAG": {
+                "required": False,
+                "regex": r"^[YN]$",
+                "error_msg": "PRIMARY_ASSIGNMENT_FLAG must be Y (Yes) or N (No)",
+            },
+            "PROBATION_PERIOD": {
+                "required": False,
+                "min_length": 1,
+                "max_length": 10,
+                "regex": r"^[0-9]+$",
+                "error_msg": "PROBATION_PERIOD must be a numeric value, 1-10 chars",
+            },
+            "PROJECT_TITLE": {
+                "required": False,
+                "min_length": 1,
+                "max_length": 240,
+                "error_msg": "PROJECT_TITLE must be 1-240 chars",
+            },
+            "PROJECTED_END_DATE": {
+                "required": False,
+                "data_type": "date",
+                "error_msg": "PROJECTED_END_DATE must be a valid date",
+            },
+            "PROJECTED_START_DATE": {
+                "required": False,
+                "data_type": "date",
+                "error_msg": "PROJECTED_START_DATE must be a valid date",
+            },
+            "PROPOSED_USER_PERSON_TYPE": {
+                "required": False,
+                "min_length": 1,
+                "max_length": 80,
+                "error_msg": "PROPOSED_USER_PERSON_TYPE must be 1-80 chars",
+            },
+            "PROPOSED_WORKER_TYPE": {
+                "required": False,
+                "min_length": 1,
+                "max_length": 30,
+                "regex": r"^[A-Z0-9_]+$",
+                "error_msg": "PROPOSED_WORKER_TYPE must be uppercase alphanumeric/underscore, 1-30 chars",
+            },
+            "REASON_CODE": {
+                "required": False,
+                "min_length": 1,
+                "max_length": 30,
+                "regex": r"^[A-Z0-9_]+$",
+                "error_msg": "REASON_CODE must be uppercase alphanumeric/underscore, 1-30 chars",
+            },
+            "RETIREMENT_AGE": {
+                "required": False,
+                "min_length": 1,
+                "max_length": 3,
+                "regex": r"^[0-9]+$",
+                "error_msg": "RETIREMENT_AGE must be a numeric value, 1-3 chars",
+            },
+            "RETIREMENT_DATE": {
+                "required": False,
+                "data_type": "date",
+                "error_msg": "RETIREMENT_DATE must be a valid date",
+            },
+            "SPECIAL_CEILING_STEP": {
+                "required": False,
+                "min_length": 1,
+                "max_length": 30,
+                "error_msg": "SPECIAL_CEILING_STEP must be 1-30 chars",
+            },
+            "TAX_ADDRESS_ID": {
+                "required": False,
+                "min_length": 1,
+                "max_length": 30,
+                "regex": r"^[0-9]+$",
+                "error_msg": "TAX_ADDRESS_ID must be a numeric value, 1-30 chars",
+            },
+            "END_TIME": {
+                "required": False,
+                "min_length": 1,
+                "max_length": 10,
+                "regex": r"^([01]\d|2[0-3]):[0-5]\d$",
+                "error_msg": "END_TIME must be a valid time in HH:MM format",
+            },
+            "START_TIME": {
+                "required": False,
+                "min_length": 1,
+                "max_length": 10,
+                "regex": r"^([01]\d|2[0-3]):[0-5]\d$",
+                "error_msg": "START_TIME must be a valid time in HH:MM format",
+            },
+            "WORK_AT_HOME_FLAG": {
+                "required": False,
+                "regex": r"^[YN]$",
+                "error_msg": "WORK_AT_HOME_FLAG must be Y (Yes) or N (No)",
+            },
+            "FREEZE_START_DATE": {
+                "required": False,
+                "data_type": "date",
+                "error_msg": "FREEZE_START_DATE must be a valid date",
+            },
+            "FREEZE_UNTIL_DATE": {
+                "required": False,
+                "data_type": "date",
+                "error_msg": "FREEZE_UNTIL_DATE must be a valid date",
+            },
+            "GUID": {
+                "required": False,
+                "min_length": 1,
+                "max_length": 64,
+                "regex": r"^[A-Za-z0-9_\-]+$",
+                "error_msg": "GUID must be alphanumeric with underscores/dashes, 1-64 chars",
+            },
+            "PEOPLE_GROUP": {
+                "required": False,
+                "min_length": 1,
+                "max_length": 240,
+                "error_msg": "PEOPLE_GROUP must be 1-240 chars",
+            },
+            "GSP_ELIGIBILITY_FLAG": {
+                "required": False,
+                "regex": r"^[YN]$",
+                "error_msg": "GSP_ELIGIBILITY_FLAG must be Y (Yes) or N (No)",
+            },
+            "DEFAULT_EXPENSE_ACCOUNT": {
+                "required": False,
+                "min_length": 1,
+                "max_length": 240,
+                "error_msg": "DEFAULT_EXPENSE_ACCOUNT must be 1-240 chars",
+            },
+            "UNION_ID": {
+                "required": False,
+                "min_length": 1,
+                "max_length": 30,
+                "regex": r"^[0-9]+$",
+                "error_msg": "UNION_ID must be a numeric value, 1-30 chars",
+            },
+            "UNION_NAME": {
+                "required": False,
+                "min_length": 1,
+                "max_length": 240,
+                "error_msg": "UNION_NAME must be 1-240 chars",
+            },
+            "OVERTIME_PERIOD_NAME": {
+                "required": False,
+                "min_length": 1,
+                "max_length": 80,
+                "error_msg": "OVERTIME_PERIOD_NAME must be 1-80 chars",
+            },
+            "SOURCE_ASSIGNMENT_NUMBER": {
+                "required": False,
+                "min_length": 1,
+                "max_length": 30,
+                "regex": r"^[A-Z0-9_-]+$",
+                "error_msg": "SOURCE_ASSIGNMENT_NUMBER must be alphanumeric with underscores/dashes, 1-30 chars",
+            },
+            "TAX_REPORTING_UNIT": {
+                "required": False,
+                "min_length": 1,
+                "max_length": 240,
+                "error_msg": "TAX_REPORTING_UNIT must be 1-240 chars",
+            },
+            "CONTRACT_NUMBER": {
+                "required": False,
+                "min_length": 1,
+                "max_length": 30,
+                "regex": r"^[A-Z0-9_-]+$",
+                "error_msg": "CONTRACT_NUMBER must be alphanumeric with underscores/dashes, 1-30 chars",
+            },
+            "TERMINATION_DATE": {
+                "required": False,
+                "data_type": "date",
+                "error_msg": "TERMINATION_DATE must be a valid date",
+            },
+            "NOTIFICATION_DATE": {
+                "required": False,
+                "data_type": "date",
+                "error_msg": "NOTIFICATION_DATE must be a valid date",
+            },
+            "LAST_WORKING_DATE": {
+                "required": False,
+                "data_type": "date",
+                "error_msg": "LAST_WORKING_DATE must be a valid date",
+            },
+            "REHIRE_AUTHORIZER_PERSON_NUMBER": {
+                "required": False,
+                "min_length": 1,
+                "max_length": 30,
+                "regex": r"^[A-Z0-9_-]+$",
+                "error_msg": "REHIRE_AUTHORIZER_PERSON_NUMBER must be alphanumeric with underscores/dashes, 1-30 chars",
+            },
+            "TERMINATE_ASSIGNMENT_FLAG": {
+                "required": False,
+                "regex": r"^[YN]$",
+                "error_msg": "TERMINATE_ASSIGNMENT_FLAG must be Y (Yes) or N (No)",
+            },
+            "CORRECT_ASSIGNMENT_TERMINATION_FLAG": {
+                "required": False,
+                "regex": r"^[YN]$",
+                "error_msg": "CORRECT_ASSIGNMENT_TERMINATION_FLAG must be Y (Yes) or N (No)",
+            },
+            "REVERSE_ASSIGNMENT_TERMINATION_FLAG": {
+                "required": False,
+                "regex": r"^[YN]$",
+                "error_msg": "REVERSE_ASSIGNMENT_TERMINATION_FLAG must be Y (Yes) or N (No)",
+            },
+            "REQUISITION_NUMBER": {
+                "required": False,
+                "min_length": 1,
+                "max_length": 30,
+                "regex": r"^[A-Z0-9_-]+$",
+                "error_msg": "REQUISITION_NUMBER must be alphanumeric with underscores/dashes, 1-30 chars",
+            },
+            "CANDIDATE_NUMBER": {
+                "required": False,
+                "min_length": 1,
+                "max_length": 30,
+                "regex": r"^[A-Z0-9_-]+$",
+                "error_msg": "CANDIDATE_NUMBER must be alphanumeric with underscores/dashes, 1-30 chars",
+            },
+            "ADJUSTED_FTE": {
+                "required": False,
+                "min_length": 1,
+                "max_length": 10,
+                "regex": r"^[0-9]+(\.[0-9]+)?$",
+                "error_msg": "ADJUSTED_FTE must be a valid numeric value, 1-10 chars",
+            },
+            "ANNUAL_WORKING_DURATION": {
+                "required": False,
+                "min_length": 1,
+                "max_length": 10,
+                "regex": r"^[0-9]+(\.[0-9]+)?$",
+                "error_msg": "ANNUAL_WORKING_DURATION must be a valid numeric value, 1-10 chars",
+            },
+            "ANNUAL_WORKING_DURATION_UNITS": {
+                "required": False,
+                "min_length": 1,
+                "max_length": 30,
+                "regex": r"^[A-Z0-9_]+$",
+                "error_msg": "ANNUAL_WORKING_DURATION_UNITS must be uppercase alphanumeric/underscore, 1-30 chars",
+            },
+            "ANNUAL_WORKING_RATIO": {
+                "required": False,
+                "min_length": 1,
+                "max_length": 10,
+                "regex": r"^[0-9]+(\.[0-9]+)?$",
+                "error_msg": "ANNUAL_WORKING_RATIO must be a valid numeric value, 1-10 chars",
+            },
+            "STANDARD_HOURS": {
+                "required": False,
+                "min_length": 1,
+                "max_length": 10,
+                "regex": r"^[0-9]+(\.[0-9]+)?$",
+                "error_msg": "STANDARD_HOURS must be a valid numeric value, 1-10 chars",
+            },
+            "STD_ANNUAL_WORKING_DURATION": {
+                "required": False,
+                "min_length": 1,
+                "max_length": 10,
+                "regex": r"^[0-9]+(\.[0-9]+)?$",
+                "error_msg": "STD_ANNUAL_WORKING_DURATION must be a valid numeric value, 1-10 chars",
+            },
+            "NOTES": {
+                "required": False,
+                "min_length": 1,
+                "max_length": 240,
+                "error_msg": "NOTES must be 1-240 chars",
+            },
+        },
+        default_source_system_owner="HCMQA-001",
+        default_source_system_id="ASSIGNMENT_{row_index}",
+        output_filename_template="Assignment.dat",
+        output_header="METADATA|Assignment|SourceSystemOwner|SourceSystemId|AssignmentNumber|WorkTermsNumber|EffectiveLatestChange|EffectiveSequence|EffectiveStartDate|EffectiveEndDate|AssignmentStatusTypeCode|AssignmentType|BusinessUnitShortCode|PrimaryFlag|PersonNumber|ActionCode|AssignmentName|BargainingUnitCode|BillingTitle|CollectiveAgreementIdCode|ContractId|DateProbationEnd|ReportingEstablishment|LegalEmployerName|GradeCode|GradeLadderPgmName|HourlySalariedCode|InternalBuilding|InternalFloor|InternalLocation|InternalMailstop|InternalOfficeNumber|JobCode|LabourUnionMemberFlag|LocationCode|ManagerFlag|NormalHours|NoticePeriod|DepartmentName|DateStart|PersonTypeCode|SystemPersonType|PositionCode|PositionOverrideFlag|PrimaryAssignmentFlag|ProbationPeriod|ProjectTitle|ProjectedEndDate|ProjectedStartDate|ProposedUserPersonType|ProposedWorkerType|ReasonCode|RetirementAge|RetirementDate|SpecialCeilingStep|TaxAddressId|EndTime|StartTime|WorkAtHomeFlag|FreezeStartDate|FreezeUntilDate|GUID|PeopleGroup|GspEligibilityFlag|DefaultExpenseAccount|UnionId|UnionName|OvertimePeriodName|SourceAssignmentNumber|TaxReportingUnit|ContractNumber|TerminationDate|NotificationDate|LastWorkingDate|RehireAuthorizerPersonNumber|TerminateAssignmentFlag|CorrectAssignmentTerminationFlag|ReverseAssignmentTerminationFlag|RequisitionNumber|CandidateNumber|AdjustedFte|AnnualWorkingDuration|AnnualWorkingDurationUnits|AnnualWorkingRatio|StandardHours|StdAnnualWorkingDuration|Notes",
+        output_template=(
+            "MERGE|Assignment|{SOURCE_SYSTEM_OWNER}|{SOURCE_SYSTEM_ID}|"
+            "{ASSIGNMENT_NUMBER}|{WORK_TERMS_NUMBER}|"
+            "{EFFECTIVE_LATEST_CHANGE}|{EFFECTIVE_SEQUENCE}|"
+            "{EFFECTIVE_START_DATE}|{EFFECTIVE_END_DATE}|"
+            "{ASSIGNMENT_STATUS_TYPE_CODE}|{ASSIGNMENT_TYPE}|"
+            "{BUSINESS_UNIT_SHORT_CODE}|{PRIMARY_FLAG}|{PERSON_NUMBER}|"
+            "{ACTION_CODE}|{ASSIGNMENT_NAME}|{BARGAINING_UNIT_CODE}|"
+            "{BILLING_TITLE}|{COLLECTIVE_AGREEMENT_ID_CODE}|{CONTRACT_ID}|"
+            "{DATE_PROBATION_END}|{REPORTING_ESTABLISHMENT}|{LEGAL_EMPLOYER_NAME}|"
+            "{GRADE_CODE}|{GRADE_LADDER_PGM_NAME}|{HOURLY_SALARIED_CODE}|"
+            "{INTERNAL_BUILDING}|{INTERNAL_FLOOR}|{INTERNAL_LOCATION}|"
+            "{INTERNAL_MAILSTOP}|{INTERNAL_OFFICE_NUMBER}|{JOB_CODE}|"
+            "{LABOUR_UNION_MEMBER_FLAG}|{LOCATION_CODE}|{MANAGER_FLAG}|"
+            "{NORMAL_HOURS}|{NOTICE_PERIOD}|{DEPARTMENT_NAME}|{DATE_START}|"
+            "{PERSON_TYPE_CODE}|{SYSTEM_PERSON_TYPE}|{POSITION_CODE}|"
+            "{POSITION_OVERRIDE_FLAG}|{PRIMARY_ASSIGNMENT_FLAG}|{PROBATION_PERIOD}|"
+            "{PROJECT_TITLE}|{PROJECTED_END_DATE}|{PROJECTED_START_DATE}|"
+            "{PROPOSED_USER_PERSON_TYPE}|{PROPOSED_WORKER_TYPE}|{REASON_CODE}|"
+            "{RETIREMENT_AGE}|{RETIREMENT_DATE}|{SPECIAL_CEILING_STEP}|{TAX_ADDRESS_ID}|"
+            "{END_TIME}|{START_TIME}|{WORK_AT_HOME_FLAG}|"
+            "{FREEZE_START_DATE}|{FREEZE_UNTIL_DATE}|{GUID}|{PEOPLE_GROUP}|"
+            "{GSP_ELIGIBILITY_FLAG}|{DEFAULT_EXPENSE_ACCOUNT}|{UNION_ID}|{UNION_NAME}|"
+            "{OVERTIME_PERIOD_NAME}|{SOURCE_ASSIGNMENT_NUMBER}|{TAX_REPORTING_UNIT}|"
+            "{CONTRACT_NUMBER}|{TERMINATION_DATE}|{NOTIFICATION_DATE}|{LAST_WORKING_DATE}|"
+            "{REHIRE_AUTHORIZER_PERSON_NUMBER}|{TERMINATE_ASSIGNMENT_FLAG}|"
+            "{CORRECT_ASSIGNMENT_TERMINATION_FLAG}|{REVERSE_ASSIGNMENT_TERMINATION_FLAG}|"
+            "{REQUISITION_NUMBER}|{CANDIDATE_NUMBER}|{ADJUSTED_FTE}|"
+            "{ANNUAL_WORKING_DURATION}|{ANNUAL_WORKING_DURATION_UNITS}|{ANNUAL_WORKING_RATIO}|"
+            "{STANDARD_HOURS}|{STD_ANNUAL_WORKING_DURATION}|{NOTES}"
+        ),
+        description="Assignment object migration file for Oracle Fusion HCM Workforce Structures.",
     ),
 
     "Organization": ObjectDefinition(
