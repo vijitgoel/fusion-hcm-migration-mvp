@@ -6,7 +6,7 @@ import shutil
 from pathlib import Path
 from typing import Any, Dict, List
 
-from .utils import ensure_dir
+from .utils import ensure_dir, sanitize_for_json
 
 
 def write_text(path: Path, content: str) -> None:
@@ -16,7 +16,9 @@ def write_text(path: Path, content: str) -> None:
 
 def write_json(path: Path, payload: Dict[str, Any]) -> None:
     ensure_dir(path.parent)
-    path.write_text(json.dumps(payload, indent=2, ensure_ascii=False), encoding="utf-8")
+    # Sanitize before JSON serialization to handle NaN, numpy, Path, Timestamp, dataclasses, etc.
+    safe_payload = sanitize_for_json(payload)
+    path.write_text(json.dumps(safe_payload, indent=2, ensure_ascii=False), encoding="utf-8")
 
 
 def write_dat(path: Path, header: str, rows: List[str]) -> None:
@@ -44,9 +46,12 @@ def write_rejected_csv(path: Path, rejected_rows: List[Dict[str, Any]]) -> None:
         writer = csv.DictWriter(fp, fieldnames=fieldnames)
         writer.writeheader()
         for row in rejected_rows:
+            # Sanitize row_values (may contain NaN/numpy values from pandas row.to_dict())
+            # to ensure the embedded JSON in rejected CSV is always valid. Validation details preserved.
+            row_values_safe = sanitize_for_json(row.get("row_values", {}))
             writer.writerow({
                 **{key: row.get(key, "") for key in fieldnames},
-                "row_values": json.dumps(row.get("row_values", {}), ensure_ascii=False),
+                "row_values": json.dumps(row_values_safe, ensure_ascii=False),
             })
 
 

@@ -14,6 +14,7 @@ from pydantic import BaseModel
 
 from services.hdl_generator import generate_hdl
 from services.phase3.engine import process_folder
+from services.phase3.utils import sanitize_for_json
 from services.validator import validate_columns, validate_data
 from pathlib import Path
 
@@ -155,6 +156,12 @@ async def batch_process(req: BatchRequest):
         # Config is pulled centrally from services/config.py (FUSION_CONFIG).
         # Legacy orchestrator is no longer used for new batch requests.
         summary = process_folder(Path(folder))
+        # CENTRAL SANITIZER: converts NaN→None, numpy→native, Timestamp→ISO, Path→str,
+        # recurses into dataclasses/dicts/lists. Prevents JSON serialization failures
+        # (HTTP 500) while preserving ALL validation details, row_values, issues, etc.
+        # Applied immediately before JSONResponse per requirements. Covers /batch,
+        # future /phase3/* endpoints, and any summary/download responses.
+        summary = sanitize_for_json(summary)
 
         return JSONResponse(
             content={
